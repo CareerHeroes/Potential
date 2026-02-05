@@ -24,6 +24,7 @@ def route_operators(inputs: dict, top_n: int) -> dict:
         "op.card06_identity": 0,
         "op.card07_laws_rules": 0,
         "op.card08_action_outcome": 0,
+        "op.card08_1_capacity_phase": 0,
         "op.card09_thresholds": 0,
         "op.card10_transition_ambiguity": 0,
         "op.card11_learning_staircase": 0,
@@ -58,6 +59,12 @@ def route_operators(inputs: dict, top_n: int) -> dict:
         scores["op.card07_laws_rules"] += 20
     if inputs.get("aor_verified") is False:
         scores["op.card08_action_outcome"] += 35
+    if (
+        inputs.get("action_defined") is False
+        or inputs.get("success_signal_defined") is False
+        or inputs.get("adaptation_defined") is False
+    ):
+        scores["op.card08_1_capacity_phase"] += 35
     if inputs.get("effort_correct") is True and inputs.get("input_level", 0) <= inputs.get("threshold_value", 0):
         scores["op.card09_thresholds"] += 30
     if inputs.get("transition_phase") is True and inputs.get("confusion_reported") is True:
@@ -148,6 +155,12 @@ OPERATOR_INPUTS = {
         "aoe_valid",
         "se_ready",
         "see_ready"
+    ],
+    "op.card08_1_capacity_phase": [
+        "action_defined",
+        "success_signal_defined",
+        "adaptation_defined",
+        "acted_recently"
     ],
     "op.card09_thresholds": [
         "input_level",

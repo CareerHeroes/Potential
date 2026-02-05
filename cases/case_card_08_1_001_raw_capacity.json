@@ -1,0 +1,18 @@
+{
+  "case_id": "case_card_08_1_001_raw_capacity",
+  "inputs": {
+    "action_defined": false,
+    "success_signal_defined": false,
+    "adaptation_defined": false,
+    "acted_recently": false
+  },
+  "operator_sequence": [
+    "op.card08_1_capacity_phase"
+  ],
+  "expected": {
+    "status": "GATED",
+    "state": {
+      "capacity_phase": "RAW_CAPACITY"
+    }
+  }
+}

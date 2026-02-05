@@ -1,0 +1,32 @@
+{
+  "id": "op.card08_1_capacity_phase",
+  "name": "Card 8.1: Capacity & Execution Phases",
+  "rules": [
+    {
+      "when": "action_defined == false or success_signal_defined == false or adaptation_defined == false",
+      "set": {
+        "capacity_phase": "RAW_CAPACITY"
+      }
+    },
+    {
+      "when": "action_defined == true and success_signal_defined == true and adaptation_defined == true and acted_recently == false",
+      "set": {
+        "capacity_phase": "STRUCTURED_POTENTIAL"
+      }
+    },
+    {
+      "when": "true",
+      "set": {
+        "capacity_phase": "KINETIC_EXECUTION"
+      }
+    }
+  ],
+  "gates": [
+    {
+      "id": "gate.missing_evaluable_action",
+      "when": "action_defined == false or success_signal_defined == false",
+      "action": "BLOCK_PROGRESS",
+      "message": "Define the next 48-hour action and an external success signal before executing."
+    }
+  ]
+}

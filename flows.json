@@ -17,8 +17,12 @@
     "op.card06_identity",
     "op.card07_laws_rules",
     "op.card08_action_outcome",
+    "op.card08_1_capacity_phase",
     "op.card09_thresholds",
     "op.card10_transition_ambiguity"
+  ],
+  "card_08_1_capacity_phase": [
+    "op.card08_1_capacity_phase"
   ],
   "cards_11_15": [
     "op.card11_learning_staircase",
@@ -43,6 +47,7 @@
     "op.card06_identity",
     "op.card07_laws_rules",
     "op.card08_action_outcome",
+    "op.card08_1_capacity_phase",
     "op.card09_thresholds",
     "op.card10_transition_ambiguity",
     "op.card11_learning_staircase",

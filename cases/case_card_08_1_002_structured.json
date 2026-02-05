@@ -1,0 +1,18 @@
+{
+  "case_id": "case_card_08_1_002_structured",
+  "inputs": {
+    "action_defined": true,
+    "success_signal_defined": true,
+    "adaptation_defined": true,
+    "acted_recently": false
+  },
+  "operator_sequence": [
+    "op.card08_1_capacity_phase"
+  ],
+  "expected": {
+    "status": "OK",
+    "state": {
+      "capacity_phase": "STRUCTURED_POTENTIAL"
+    }
+  }
+}
