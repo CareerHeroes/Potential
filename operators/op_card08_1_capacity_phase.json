@@ -24,9 +24,9 @@
   "gates": [
     {
       "id": "gate.missing_evaluable_action",
-      "when": "action_defined == false or success_signal_defined == false",
+      "when": "action_defined == false or success_signal_defined == false or adaptation_defined == false",
       "action": "BLOCK_PROGRESS",
-      "message": "Define the next 48-hour action and an external success signal before executing."
+      "message": "Define the next 48-hour action, external success signal, and adaptation rule before executing."
     }
   ]
 }
