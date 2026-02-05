@@ -1,0 +1,33 @@
+{
+  "id": "op.evidence_ratio",
+  "name": "Evidence Ratio",
+  "rules": [
+    {
+      "when": "jc_inquiries >= 8",
+      "set": {
+        "job_coaching_score": 80
+      }
+    },
+    {
+      "when": "jc_inquiries >= 4",
+      "set": {
+        "job_coaching_score": 50
+      }
+    },
+    {
+      "when": "true",
+      "set": {
+        "job_coaching_score": 10
+      }
+    }
+  ],
+  "gates": [
+    {
+      "id": "gate.low_job_coaching_score",
+      "when": "job_coaching_score < 20",
+      "action": "BLOCK_PROGRESS",
+      "message": "Job coaching evidence score too low."
+    }
+  ]
+}
+  

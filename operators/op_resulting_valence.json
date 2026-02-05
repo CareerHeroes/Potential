@@ -1,0 +1,35 @@
+{
+  "id": "op.resulting_valence",
+  "name": "Resulting Valence",
+  "rules": [
+    {
+      "when": "(perceived_reward * likelihood_success) - (perceived_risk * likelihood_failure) >= 20",
+      "set": {
+        "valence": "APPROACH",
+        "valence_score": 60
+      }
+    },
+    {
+      "when": "(perceived_reward * likelihood_success) - (perceived_risk * likelihood_failure) <= -20",
+      "set": {
+        "valence": "AVOID",
+        "valence_score": -60
+      }
+    },
+    {
+      "when": "true",
+      "set": {
+        "valence": "CONFLICT",
+        "valence_score": 0
+      }
+    }
+  ],
+  "gates": [
+    {
+      "id": "gate.valence_conflict_deadline",
+      "when": "valence == 'CONFLICT' and decision_deadline_days <= 7",
+      "action": "REQUIRE_COMMITMENT",
+      "message": "Conflict in valence with an imminent deadline. Commit to an action or specify what evidence will resolve it."
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "id": "op.cash_pressure",
+  "name": "Cash Pressure",
+  "rules": [
+    {
+      "when": "decision_horizon_days <= 90 and runway_months <= 6",
+      "set": {
+        "cash_pressure": "HIGH"
+      }
+    },
+    {
+      "when": "runway_months <= 18",
+      "set": {
+        "cash_pressure": "MEDIUM"
+      }
+    },
+    {
+      "when": "true",
+      "set": {
+        "cash_pressure": "LOW"
+      }
+    }
+  ],
+  "gates": []
+}
+  

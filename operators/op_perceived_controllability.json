@@ -1,0 +1,32 @@
+{
+  "id": "op.perceived_controllability",
+  "name": "Perceived Controllability",
+  "rules": [
+    {
+      "when": "controllability_evidence_count >= 2 and controllability_belief >= 50",
+      "set": {
+        "controllability": "HIGH"
+      }
+    },
+    {
+      "when": "controllability_evidence_count >= 1",
+      "set": {
+        "controllability": "MEDIUM"
+      }
+    },
+    {
+      "when": "true",
+      "set": {
+        "controllability": "LOW"
+      }
+    }
+  ],
+  "gates": [
+    {
+      "id": "gate.low_controllability",
+      "when": "controllability == 'LOW' and action_required == true",
+      "action": "BLOCK_PROGRESS",
+      "message": "Perceived controllability is too low. Identify a small action that can change the odds."
+    }
+  ]
+}

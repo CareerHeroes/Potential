@@ -1,0 +1,43 @@
+{
+  "id": "op.allocation",
+  "name": "Allocation",
+  "rules": [
+    {
+      "when": "cash_pressure == 'HIGH' and job_coaching_score >= 40",
+      "set": {
+        "alloc_job_coaching": 65,
+        "alloc_tool_development": 35
+      }
+    },
+    {
+      "when": "cash_pressure == 'HIGH' and job_coaching_score < 40",
+      "set": {
+        "alloc_job_coaching": 55,
+        "alloc_tool_development": 45
+      }
+    },
+    {
+      "when": "cash_pressure == 'MEDIUM'",
+      "set": {
+        "alloc_job_coaching": 55,
+        "alloc_tool_development": 45
+      }
+    },
+    {
+      "when": "true",
+      "set": {
+        "alloc_job_coaching": 45,
+        "alloc_tool_development": 55
+      }
+    }
+  ],
+  "gates": [
+    {
+      "id": "gate.allocation_sums",
+      "when": "alloc_job_coaching + alloc_tool_development != 100",
+      "action": "BLOCK_PROGRESS",
+      "message": "Allocation must sum to 100."
+    }
+  ]
+}
+  

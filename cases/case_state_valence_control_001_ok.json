@@ -1,0 +1,29 @@
+{
+  "case_id": "case_state_valence_control_001_ok",
+  "inputs": {
+    "state_facts_count": 3,
+    "desired_state_defined": true,
+    "standard_defined": true,
+    "perceived_reward": 80,
+    "perceived_risk": 40,
+    "likelihood_success": 0.6,
+    "likelihood_failure": 0.4,
+    "decision_deadline_days": 30,
+    "controllability_evidence_count": 1,
+    "controllability_belief": 60,
+    "action_required": true
+  },
+  "operator_sequence": [
+    "op.state_clarity",
+    "op.resulting_valence",
+    "op.perceived_controllability"
+  ],
+  "expected": {
+    "status": "OK",
+    "state": {
+      "state_clarity_score": 80,
+      "valence": "APPROACH",
+      "controllability": "MEDIUM"
+    }
+  }
+}

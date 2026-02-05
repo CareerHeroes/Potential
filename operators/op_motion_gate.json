@@ -1,0 +1,27 @@
+{
+  "id": "op.motion_gate",
+  "name": "Motion Gate",
+  "rules": [
+    {
+      "when": "days_since_new_information >= 14",
+      "set": {
+        "must_commit": true
+      }
+    },
+    {
+      "when": "true",
+      "set": {
+        "must_commit": false
+      }
+    }
+  ],
+  "gates": [
+    {
+      "id": "gate.require_commitment",
+      "when": "must_commit == true",
+      "action": "REQUIRE_COMMITMENT",
+      "message": "Commit to the current allocation."
+    }
+  ]
+}
+  

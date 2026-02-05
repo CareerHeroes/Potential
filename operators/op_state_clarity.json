@@ -1,0 +1,35 @@
+{
+  "id": "op.state_clarity",
+  "name": "State Clarity",
+  "rules": [
+    {
+      "when": "state_facts_count >= 3 and desired_state_defined == true and standard_defined == true",
+      "set": {
+        "state_clarity_score": 80,
+        "state_gap_defined": true
+      }
+    },
+    {
+      "when": "state_facts_count >= 1 and (desired_state_defined == true or standard_defined == true)",
+      "set": {
+        "state_clarity_score": 40,
+        "state_gap_defined": false
+      }
+    },
+    {
+      "when": "true",
+      "set": {
+        "state_clarity_score": 10,
+        "state_gap_defined": false
+      }
+    }
+  ],
+  "gates": [
+    {
+      "id": "gate.missing_state_gap",
+      "when": "state_gap_defined == false",
+      "action": "BLOCK_PROGRESS",
+      "message": "Clarify current state, desired state, and standard before proceeding."
+    }
+  ]
+}

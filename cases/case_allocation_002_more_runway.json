@@ -1,0 +1,37 @@
+{
+  "case_id": "case_allocation_002_more_runway",
+  "inputs": {
+    "decision_horizon_days": 90,
+    "days_since_new_information": 3,
+    "assumptions": {
+      "job_coaching": [],
+      "tool_development": []
+    },
+    "evidence": {
+      "job_coaching": {
+        "recent_client_inquiries": 5
+      },
+      "tool_development": {
+        "paying_users": 0
+      }
+    },
+    "personal_constraints": {
+      "available_hours_per_week": 40,
+      "financial_runway_months": 24
+    }
+  },
+  "operator_sequence": [
+    "op.cash_pressure",
+    "op.evidence_ratio",
+    "op.allocation",
+    "op.tool_evidence",
+    "op.motion_gate"
+  ],
+  "expected": {
+    "status": "OK",
+    "state": {
+      "alloc_job_coaching": 45,
+      "alloc_tool_development": 55
+    }
+  }
+}

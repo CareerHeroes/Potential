@@ -1,0 +1,38 @@
+{
+  "id": "op.tool_evidence",
+  "name": "Tool Evidence",
+  "rules": [
+    {
+      "when": "tool_paying_users >= 50",
+      "set": {
+        "tool_score": 80
+      }
+    },
+    {
+      "when": "tool_paying_users >= 10",
+      "set": {
+        "tool_score": 50
+      }
+    },
+    {
+      "when": "tool_paying_users >= 1",
+      "set": {
+        "tool_score": 35
+      }
+    },
+    {
+      "when": "true",
+      "set": {
+        "tool_score": 30
+      }
+    }
+  ],
+  "gates": [
+    {
+      "id": "gate.tool_low_for_allocation",
+      "when": "alloc_tool_development >= 50 and tool_score < 30",
+      "action": "BLOCK_PROGRESS",
+      "message": "Tool allocation too high for current evidence."
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "case_id": "case_state_valence_control_003_low_control",
+  "inputs": {
+    "state_facts_count": 3,
+    "desired_state_defined": true,
+    "standard_defined": true,
+    "perceived_reward": 60,
+    "perceived_risk": 30,
+    "likelihood_success": 0.5,
+    "likelihood_failure": 0.4,
+    "decision_deadline_days": 30,
+    "controllability_evidence_count": 0,
+    "controllability_belief": 30,
+    "action_required": true
+  },
+  "operator_sequence": [
+    "op.state_clarity",
+    "op.resulting_valence",
+    "op.perceived_controllability"
+  ],
+  "expected": {
+    "status": "GATED",
+    "state": {
+      "controllability": "LOW"
+    }
+  }
+}
