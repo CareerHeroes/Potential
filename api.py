@@ -91,6 +91,112 @@ def route_operators(inputs: dict, top_n: int) -> dict:
     return {"operators": top, "scores": scores}
 
 
+OPERATOR_INPUTS = {
+    "op.card01_state_standard": [
+        "state_value",
+        "standard_value",
+        "state_unit",
+        "standard_unit",
+        "state_is_verifiable"
+    ],
+    "op.card02_resulting_valence": [
+        "attraction",
+        "p_success_adj",
+        "aversion",
+        "p_failure",
+        "cost",
+        "procrastination_reported"
+    ],
+    "op.card03_controllability": [
+        "controllability_scalar",
+        "p_success",
+        "cites_external_factors",
+        "successful_transitions_count",
+        "identity_update_threshold"
+    ],
+    "op.card04_multicausality": [
+        "user_causal_weight",
+        "delegates_to_others"
+    ],
+    "op.card05_attribution": [
+        "attribution_locus",
+        "attribution_stability",
+        "attribution_scope"
+    ],
+    "op.card06_identity": [
+        "successful_transitions_count",
+        "identity_update_threshold",
+        "attempts_identity_change"
+    ],
+    "op.card07_laws_rules": [
+        "constraint_type",
+        "aversion"
+    ],
+    "op.card08_action_outcome": [
+        "aor_verified",
+        "aoe_valid",
+        "se_ready",
+        "see_ready"
+    ],
+    "op.card09_thresholds": [
+        "input_level",
+        "threshold_value",
+        "effort_correct"
+    ],
+    "op.card10_transition_ambiguity": [
+        "transition_phase",
+        "confusion_reported"
+    ],
+    "op.card11_learning_staircase": [
+        "learning_stage",
+        "discomfort_reported"
+    ],
+    "op.card12_abduction": [
+        "demands_certainty"
+    ],
+    "op.card13_leverage": [
+        "displacement",
+        "effort",
+        "resulting_valence"
+    ],
+    "op.card14_pragmatic_idealism": [
+        "ideal_changed"
+    ],
+    "op.card15_mental_immune": [
+        "data_rejected"
+    ],
+    "op.card16_mental_hygiene": [
+        "borrowed_standard_removed"
+    ],
+    "op.card17_self_responsibility": [
+        "responsibility_framed_as_utility",
+        "guilt_framing"
+    ],
+    "op.card18_sufficiency": [
+        "necessary_claimed",
+        "alternative_sufficiencies_count"
+    ],
+    "op.card19_goal_pyramid": [
+        "behavior_stuck",
+        "higher_layer_conflict"
+    ],
+    "op.card20_learning_pathways": [
+        "fear_reported",
+        "evidence_interpreted_as_inability"
+    ]
+}
+
+
+def missing_inputs_for(sequence: list, inputs: dict) -> dict:
+    missing = {}
+    for op_id in sequence:
+        required = OPERATOR_INPUTS.get(op_id, [])
+        missing_keys = [key for key in required if key not in inputs]
+        if missing_keys:
+            missing[op_id] = missing_keys
+    return missing
+
+
 class Handler(BaseHTTPRequestHandler):
     def _set_headers(self, status_code: int = 200):
         self.send_response(status_code)
@@ -159,6 +265,12 @@ class Handler(BaseHTTPRequestHandler):
             if not sequence:
                 self._set_headers(400)
                 self.wfile.write(json.dumps({"error": "routing returned empty operator list"}).encode("utf-8"))
+                return
+
+            missing = missing_inputs_for(sequence, inputs)
+            if missing:
+                self._set_headers(200)
+                self.wfile.write(json.dumps({"status": "NEEDS_INPUTS", "route": routed, "missing_inputs": missing}).encode("utf-8"))
                 return
 
             base_dir = os.path.dirname(os.path.abspath(__file__))
