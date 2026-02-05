@@ -91,6 +91,17 @@ def route_operators(inputs: dict, top_n: int) -> dict:
     return {"operators": top, "scores": scores}
 
 
+def recommend_phase(inputs: dict) -> str:
+    if (
+        inputs.get("state_gap_defined") is False
+        or inputs.get("aor_verified") is False
+        or inputs.get("controllability_scalar", 1) < 0.4
+        or inputs.get("resulting_valence", 1) <= 0
+    ):
+        return "BUILD_POTENTIAL"
+    return "CONVERT_TO_KINETIC"
+
+
 OPERATOR_INPUTS = {
     "op.card01_state_standard": [
         "state_value",
@@ -259,6 +270,7 @@ class Handler(BaseHTTPRequestHandler):
             if not isinstance(top_n, int) or top_n <= 0:
                 top_n = 3
             routed = route_operators(inputs, top_n)
+            phase = recommend_phase(inputs)
             sequence = routed.get("operators", [])
             case_id = payload.get("case_id", "api_case")
 
@@ -270,7 +282,12 @@ class Handler(BaseHTTPRequestHandler):
             missing = missing_inputs_for(sequence, inputs)
             if missing:
                 self._set_headers(200)
-                self.wfile.write(json.dumps({"status": "NEEDS_INPUTS", "route": routed, "missing_inputs": missing}).encode("utf-8"))
+                self.wfile.write(json.dumps({
+                    "status": "NEEDS_INPUTS",
+                    "route": routed,
+                    "phase_recommendation": phase,
+                    "missing_inputs": missing
+                }).encode("utf-8"))
                 return
 
             base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -283,7 +300,7 @@ class Handler(BaseHTTPRequestHandler):
                 return
 
             self._set_headers(200)
-            self.wfile.write(json.dumps({"route": routed, "result": result}).encode("utf-8"))
+            self.wfile.write(json.dumps({"route": routed, "phase_recommendation": phase, "result": result}).encode("utf-8"))
             return
 
         sequence = payload.get("operator_sequence")

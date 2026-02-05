@@ -1,0 +1,18 @@
+{
+  "case_id": "case_phase_002_convert_kinetic",
+  "inputs": {
+    "state_gap_defined": true,
+    "aor_verified": true,
+    "controllability_scalar": 0.7,
+    "resulting_valence": 10
+  },
+  "operator_sequence": [
+    "op.phase_potential_kinetic"
+  ],
+  "expected": {
+    "status": "OK",
+    "state": {
+      "phase_recommendation": "CONVERT_TO_KINETIC"
+    }
+  }
+}

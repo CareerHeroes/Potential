@@ -1,0 +1,19 @@
+{
+  "id": "op.phase_potential_kinetic",
+  "name": "Phase: Potential vs Kinetic",
+  "rules": [
+    {
+      "when": "state_gap_defined == false or aor_verified == false or controllability_scalar < 0.4 or resulting_valence <= 0",
+      "set": {
+        "phase_recommendation": "BUILD_POTENTIAL"
+      }
+    },
+    {
+      "when": "true",
+      "set": {
+        "phase_recommendation": "CONVERT_TO_KINETIC"
+      }
+    }
+  ],
+  "gates": []
+}

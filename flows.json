@@ -55,5 +55,18 @@
     "op.card18_sufficiency",
     "op.card19_goal_pyramid",
     "op.card20_learning_pathways"
+  ],
+  "phase_build_potential": [
+    "op.card01_state_standard",
+    "op.card08_action_outcome",
+    "op.card12_abduction",
+    "op.card16_mental_hygiene"
+  ],
+  "phase_convert_kinetic": [
+    "op.card02_resulting_valence",
+    "op.card03_controllability",
+    "op.card09_thresholds",
+    "op.card13_leverage",
+    "op.card15_mental_immune"
   ]
 }

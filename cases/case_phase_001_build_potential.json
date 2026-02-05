@@ -1,0 +1,18 @@
+{
+  "case_id": "case_phase_001_build_potential",
+  "inputs": {
+    "state_gap_defined": false,
+    "aor_verified": false,
+    "controllability_scalar": 0.2,
+    "resulting_valence": -1
+  },
+  "operator_sequence": [
+    "op.phase_potential_kinetic"
+  ],
+  "expected": {
+    "status": "OK",
+    "state": {
+      "phase_recommendation": "BUILD_POTENTIAL"
+    }
+  }
+}
