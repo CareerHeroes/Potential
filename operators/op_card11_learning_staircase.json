@@ -1,0 +1,26 @@
+{
+  "id": "op.card11_learning_staircase",
+  "name": "Card 11: Learning Staircase",
+  "rules": [
+    {
+      "when": "learning_stage == 2 and discomfort_reported == true",
+      "set": {
+        "learning_reframe": "AWARENESS_GAIN"
+      }
+    },
+    {
+      "when": "true",
+      "set": {
+        "learning_reframe": "NO_REFRAME"
+      }
+    }
+  ],
+  "gates": [
+    {
+      "id": "gate.stage2_reframe",
+      "when": "learning_stage == 2 and discomfort_reported == true",
+      "action": "REQUIRE_COMMITMENT",
+      "message": "Discomfort at Stage 2 is awareness accumulation, not talent loss. Continue practice."
+    }
+  ]
+}

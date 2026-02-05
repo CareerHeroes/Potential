@@ -1,0 +1,26 @@
+{
+  "id": "op.card10_transition_ambiguity",
+  "name": "Card 10: Transition Ambiguity",
+  "rules": [
+    {
+      "when": "transition_phase == true and confusion_reported == true",
+      "set": {
+        "ambiguity_class": "TRANSITION_SIGNAL"
+      }
+    },
+    {
+      "when": "true",
+      "set": {
+        "ambiguity_class": "NO_TRANSITION_SIGNAL"
+      }
+    }
+  ],
+  "gates": [
+    {
+      "id": "gate.transition_reframe",
+      "when": "ambiguity_class == 'TRANSITION_SIGNAL'",
+      "action": "REQUIRE_COMMITMENT",
+      "message": "Confusion is a transition signal, not failure. Stay the course and commit to the next step."
+    }
+  ]
+}

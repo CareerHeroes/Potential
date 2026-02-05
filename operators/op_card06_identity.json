@@ -1,0 +1,26 @@
+{
+  "id": "op.card06_identity",
+  "name": "Card 06: Story & Identity",
+  "rules": [
+    {
+      "when": "successful_transitions_count >= identity_update_threshold",
+      "set": {
+        "identity_update_allowed": true
+      }
+    },
+    {
+      "when": "true",
+      "set": {
+        "identity_update_allowed": false
+      }
+    }
+  ],
+  "gates": [
+    {
+      "id": "gate.identity_read_only",
+      "when": "attempts_identity_change == true and identity_update_allowed == false",
+      "action": "BLOCK_PROGRESS",
+      "message": "Identity is read-only until enough successful transitions are logged."
+    }
+  ]
+}

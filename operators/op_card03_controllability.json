@@ -1,0 +1,50 @@
+{
+  "id": "op.card03_controllability",
+  "name": "Card 03: Perceived Controllability",
+  "rules": [
+    {
+      "when": "cites_external_factors == true",
+      "set": {
+        "controllability_level": "NONE"
+      },
+      "set_expr": {
+        "p_success_adj": "p_success * 0"
+      }
+    },
+    {
+      "when": "controllability_scalar >= 0.7",
+      "set": {
+        "controllability_level": "HIGH"
+      },
+      "set_expr": {
+        "p_success_adj": "p_success * controllability_scalar"
+      }
+    },
+    {
+      "when": "controllability_scalar > 0",
+      "set": {
+        "controllability_level": "MEDIUM"
+      },
+      "set_expr": {
+        "p_success_adj": "p_success * controllability_scalar"
+      }
+    },
+    {
+      "when": "true",
+      "set": {
+        "controllability_level": "LOW"
+      },
+      "set_expr": {
+        "p_success_adj": "p_success * 0"
+      }
+    }
+  ],
+  "gates": [
+    {
+      "id": "gate.controllability_zero",
+      "when": "controllability_level == 'NONE'",
+      "action": "BLOCK_PROGRESS",
+      "message": "External factors cited. Identify at least one variable you control before proceeding."
+    }
+  ]
+}

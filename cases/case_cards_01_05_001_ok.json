@@ -1,0 +1,41 @@
+{
+  "case_id": "case_cards_01_05_001_ok",
+  "inputs": {
+    "state_value": 4,
+    "standard_value": 10,
+    "state_unit": "clients",
+    "standard_unit": "clients",
+    "state_is_verifiable": true,
+    "attraction": 100,
+    "aversion": 20,
+    "p_success": 0.7,
+    "p_failure": 0.2,
+    "cost": 5,
+    "procrastination_reported": false,
+    "controllability_scalar": 0.8,
+    "cites_external_factors": false,
+    "user_causal_weight": 1,
+    "delegates_to_others": false,
+    "attribution_locus": "EXTERNAL",
+    "attribution_stability": "TEMPORARY",
+    "attribution_scope": "SPECIFIC"
+  },
+  "operator_sequence": [
+    "op.card01_state_standard",
+    "op.card03_controllability",
+    "op.card02_resulting_valence",
+    "op.card04_multicausality",
+    "op.card05_attribution"
+  ],
+  "expected": {
+    "status": "OK",
+    "state": {
+      "state_gap_defined": true,
+      "state_gap": 6,
+      "controllability_level": "HIGH",
+      "resulting_valence": "APPROACH",
+      "causal_weight_ok": true,
+      "attribution_recode_required": false
+    }
+  }
+}

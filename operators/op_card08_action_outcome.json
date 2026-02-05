@@ -1,0 +1,44 @@
+{
+  "id": "op.card08_action_outcome",
+  "name": "Card 08: Action-Outcome Mechanics",
+  "rules": [
+    {
+      "when": "aor_verified == true and aoe_valid == true and se_ready == true and see_ready == true",
+      "set": {
+        "action_outcome_ready": true
+      }
+    },
+    {
+      "when": "true",
+      "set": {
+        "action_outcome_ready": false
+      }
+    }
+  ],
+  "gates": [
+    {
+      "id": "gate.aor_missing",
+      "when": "aor_verified == false",
+      "action": "BLOCK_PROGRESS",
+      "message": "Verify the action-outcome relationship before optimizing belief or execution."
+    },
+    {
+      "id": "gate.aoe_missing",
+      "when": "aor_verified == true and aoe_valid == false",
+      "action": "BLOCK_PROGRESS",
+      "message": "Belief in the action-outcome link is missing; correct AOE before moving on."
+    },
+    {
+      "id": "gate.se_missing",
+      "when": "aor_verified == true and aoe_valid == true and se_ready == false",
+      "action": "BLOCK_PROGRESS",
+      "message": "Skill/execution is not ready; build SE before motivation."
+    },
+    {
+      "id": "gate.see_missing",
+      "when": "aor_verified == true and aoe_valid == true and se_ready == true and see_ready == false",
+      "action": "BLOCK_PROGRESS",
+      "message": "Self-efficacy expectation is missing; address SEE last."
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "id": "op.card09_thresholds",
+  "name": "Card 09: Thresholds & Regime Changes",
+  "rules": [
+    {
+      "when": "input_level > threshold_value",
+      "set": {
+        "threshold_state": "POST_THRESHOLD"
+      }
+    },
+    {
+      "when": "true",
+      "set": {
+        "threshold_state": "PRE_THRESHOLD"
+      }
+    }
+  ],
+  "gates": [
+    {
+      "id": "gate.pre_threshold_hold",
+      "when": "threshold_state == 'PRE_THRESHOLD' and effort_correct == true",
+      "action": "BLOCK_PROGRESS",
+      "message": "Pre-threshold state. Do not abandon; maintain strategy until the threshold is crossed."
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "id": "op.card16_mental_hygiene",
+  "name": "Card 16: Mental Hygiene",
+  "rules": [
+    {
+      "when": "borrowed_standard_removed == true",
+      "set": {
+        "hygiene_clear": true
+      }
+    },
+    {
+      "when": "true",
+      "set": {
+        "hygiene_clear": false
+      }
+    }
+  ],
+  "gates": [
+    {
+      "id": "gate.remove_borrowed_standard",
+      "when": "borrowed_standard_removed == false",
+      "action": "BLOCK_PROGRESS",
+      "message": "Remove one borrowed standard or outdated belief before new action."
+    }
+  ]
+}

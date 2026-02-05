@@ -1,0 +1,32 @@
+{
+  "id": "op.card18_sufficiency",
+  "name": "Card 18: Sufficiency vs Necessity",
+  "rules": [
+    {
+      "when": "necessary_claimed == true and alternative_sufficiencies_count >= 3",
+      "set": {
+        "sufficiency_ok": true
+      }
+    },
+    {
+      "when": "necessary_claimed == false",
+      "set": {
+        "sufficiency_ok": true
+      }
+    },
+    {
+      "when": "true",
+      "set": {
+        "sufficiency_ok": false
+      }
+    }
+  ],
+  "gates": [
+    {
+      "id": "gate.expand_solutions",
+      "when": "necessary_claimed == true and alternative_sufficiencies_count < 3",
+      "action": "BLOCK_PROGRESS",
+      "message": "Identify three alternative sufficient paths."
+    }
+  ]
+}

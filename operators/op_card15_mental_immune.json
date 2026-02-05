@@ -1,0 +1,26 @@
+{
+  "id": "op.card15_mental_immune",
+  "name": "Card 15: Mental Immune System",
+  "rules": [
+    {
+      "when": "data_rejected == true",
+      "set": {
+        "threat_response": true
+      }
+    },
+    {
+      "when": "true",
+      "set": {
+        "threat_response": false
+      }
+    }
+  ],
+  "gates": [
+    {
+      "id": "gate.threat_response",
+      "when": "threat_response == true",
+      "action": "REQUIRE_COMMITMENT",
+      "message": "Threat response detected. De-escalate identity threat before re-presenting data."
+    }
+  ]
+}

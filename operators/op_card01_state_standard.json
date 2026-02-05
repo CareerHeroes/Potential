@@ -1,0 +1,41 @@
+{
+  "id": "op.card01_state_standard",
+  "name": "Card 01: State and Standard",
+  "rules": [
+    {
+      "when": "state_is_verifiable == true and state_unit == standard_unit and standard_value != null",
+      "set": {
+        "state_gap_defined": true
+      },
+      "set_expr": {
+        "state_gap": "standard_value - state_value"
+      }
+    },
+    {
+      "when": "true",
+      "set": {
+        "state_gap_defined": false
+      }
+    }
+  ],
+  "gates": [
+    {
+      "id": "gate.state_not_verifiable",
+      "when": "state_is_verifiable == false",
+      "action": "BLOCK_PROGRESS",
+      "message": "State must be a verifiable descriptor, not a judgment."
+    },
+    {
+      "id": "gate.unit_mismatch",
+      "when": "state_unit != standard_unit",
+      "action": "BLOCK_PROGRESS",
+      "message": "State and Standard must use the same units."
+    },
+    {
+      "id": "gate.missing_standard",
+      "when": "standard_value == null",
+      "action": "BLOCK_PROGRESS",
+      "message": "Standard value is required to define the gap."
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "case_id": "case_cards_11_15_002_stage2",
+  "inputs": {
+    "learning_stage": 2,
+    "discomfort_reported": true,
+    "demands_certainty": false,
+    "displacement": 10,
+    "effort": 8,
+    "resulting_valence": 5,
+    "ideal_changed": false,
+    "data_rejected": false
+  },
+  "operator_sequence": [
+    "op.card11_learning_staircase",
+    "op.card12_abduction",
+    "op.card13_leverage",
+    "op.card14_pragmatic_idealism",
+    "op.card15_mental_immune"
+  ],
+  "expected": {
+    "status": "GATED",
+    "state": {
+      "learning_reframe": "AWARENESS_GAIN"
+    }
+  }
+}

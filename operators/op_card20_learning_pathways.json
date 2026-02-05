@@ -1,0 +1,26 @@
+{
+  "id": "op.card20_learning_pathways",
+  "name": "Card 20: Learning Pathways",
+  "rules": [
+    {
+      "when": "fear_reported == true and evidence_interpreted_as_inability == true",
+      "set": {
+        "learning_pathway_confusion": true
+      }
+    },
+    {
+      "when": "true",
+      "set": {
+        "learning_pathway_confusion": false
+      }
+    }
+  ],
+  "gates": [
+    {
+      "id": "gate_fear_is_not_evidence",
+      "when": "learning_pathway_confusion == true",
+      "action": "BLOCK_PROGRESS",
+      "message": "Separate emotional association from competence data. Fear is not evidence of inability."
+    }
+  ]
+}

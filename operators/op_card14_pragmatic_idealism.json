@@ -1,0 +1,26 @@
+{
+  "id": "op.card14_pragmatic_idealism",
+  "name": "Card 14: Pragmatic Idealism",
+  "rules": [
+    {
+      "when": "ideal_changed == true",
+      "set": {
+        "ideal_violation": true
+      }
+    },
+    {
+      "when": "true",
+      "set": {
+        "ideal_violation": false
+      }
+    }
+  ],
+  "gates": [
+    {
+      "id": "gate.ideal_constant",
+      "when": "ideal_violation == true",
+      "action": "BLOCK_PROGRESS",
+      "message": "The ideal remains constant; adjust the path, not the ideal."
+    }
+  ]
+}

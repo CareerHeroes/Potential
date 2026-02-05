@@ -1,0 +1,35 @@
+{
+  "id": "op.card02_resulting_valence",
+  "name": "Card 02: Resulting Valence",
+  "rules": [
+    {
+      "when": "(attraction * p_success_adj) - (aversion * p_failure + cost) >= 10",
+      "set": {
+        "resulting_valence": "APPROACH",
+        "resulting_valence_band": 1
+      }
+    },
+    {
+      "when": "(attraction * p_success_adj) - (aversion * p_failure + cost) <= -10",
+      "set": {
+        "resulting_valence": "AVOID",
+        "resulting_valence_band": -1
+      }
+    },
+    {
+      "when": "true",
+      "set": {
+        "resulting_valence": "CONFLICT",
+        "resulting_valence_band": 0
+      }
+    }
+  ],
+  "gates": [
+    {
+      "id": "gate.procrastination_valence",
+      "when": "resulting_valence != 'APPROACH' and procrastination_reported == true",
+      "action": "BLOCK_PROGRESS",
+      "message": "Procrastination indicates zero or negative valence. Reduce aversion or failure probability instead of adding pressure."
+    }
+  ]
+}

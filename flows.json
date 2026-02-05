@@ -1,0 +1,59 @@
+{
+  "allocation": [
+    "op.cash_pressure",
+    "op.evidence_ratio",
+    "op.allocation",
+    "op.tool_evidence",
+    "op.motion_gate"
+  ],
+  "cards_01_05": [
+    "op.card01_state_standard",
+    "op.card03_controllability",
+    "op.card02_resulting_valence",
+    "op.card04_multicausality",
+    "op.card05_attribution"
+  ],
+  "cards_06_10": [
+    "op.card06_identity",
+    "op.card07_laws_rules",
+    "op.card08_action_outcome",
+    "op.card09_thresholds",
+    "op.card10_transition_ambiguity"
+  ],
+  "cards_11_15": [
+    "op.card11_learning_staircase",
+    "op.card12_abduction",
+    "op.card13_leverage",
+    "op.card14_pragmatic_idealism",
+    "op.card15_mental_immune"
+  ],
+  "cards_16_20": [
+    "op.card16_mental_hygiene",
+    "op.card17_self_responsibility",
+    "op.card18_sufficiency",
+    "op.card19_goal_pyramid",
+    "op.card20_learning_pathways"
+  ],
+  "full_01_20": [
+    "op.card01_state_standard",
+    "op.card03_controllability",
+    "op.card02_resulting_valence",
+    "op.card04_multicausality",
+    "op.card05_attribution",
+    "op.card06_identity",
+    "op.card07_laws_rules",
+    "op.card08_action_outcome",
+    "op.card09_thresholds",
+    "op.card10_transition_ambiguity",
+    "op.card11_learning_staircase",
+    "op.card12_abduction",
+    "op.card13_leverage",
+    "op.card14_pragmatic_idealism",
+    "op.card15_mental_immune",
+    "op.card16_mental_hygiene",
+    "op.card17_self_responsibility",
+    "op.card18_sufficiency",
+    "op.card19_goal_pyramid",
+    "op.card20_learning_pathways"
+  ]
+}

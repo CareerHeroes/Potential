@@ -1,0 +1,26 @@
+{
+  "case_id": "case_cards_11_15_003_low_valence",
+  "inputs": {
+    "learning_stage": 3,
+    "discomfort_reported": false,
+    "demands_certainty": false,
+    "displacement": 5,
+    "effort": 10,
+    "resulting_valence": -1,
+    "ideal_changed": false,
+    "data_rejected": false
+  },
+  "operator_sequence": [
+    "op.card11_learning_staircase",
+    "op.card12_abduction",
+    "op.card13_leverage",
+    "op.card14_pragmatic_idealism",
+    "op.card15_mental_immune"
+  ],
+  "expected": {
+    "status": "GATED",
+    "state": {
+      "efficiency": 0.5
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "id": "op.card19_goal_pyramid",
+  "name": "Card 19: Goal Pyramid",
+  "rules": [
+    {
+      "when": "behavior_stuck == true and higher_layer_conflict == true",
+      "set": {
+        "goal_pyramid_block": true
+      }
+    },
+    {
+      "when": "true",
+      "set": {
+        "goal_pyramid_block": false
+      }
+    }
+  ],
+  "gates": [
+    {
+      "id": "gate_higher_layer_conflict",
+      "when": "behavior_stuck == true and higher_layer_conflict == true",
+      "action": "BLOCK_PROGRESS",
+      "message": "Behavior is stuck due to higher-layer conflict. Resolve identity/outcome mismatch before tactics."
+    }
+  ]
+}

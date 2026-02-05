@@ -5,6 +5,15 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import engine
 
 
+def load_flows() -> dict:
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    path = os.path.join(base_dir, "flows.json")
+    if not os.path.exists(path):
+        return {}
+    with open(path, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
 class Handler(BaseHTTPRequestHandler):
     def _set_headers(self, status_code: int = 200):
         self.send_response(status_code)
@@ -48,7 +57,12 @@ class Handler(BaseHTTPRequestHandler):
 
         inputs = payload.get("inputs")
         sequence = payload.get("operator_sequence")
+        flow_id = payload.get("flow_id")
         case_id = payload.get("case_id", "api_case")
+
+        flows = load_flows()
+        if not sequence and flow_id:
+            sequence = flows.get(flow_id)
 
         if not isinstance(inputs, dict) or not isinstance(sequence, list) or not sequence:
             self._set_headers(400)

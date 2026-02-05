@@ -1,0 +1,36 @@
+{
+  "case_id": "case_cards_06_10_001_ok",
+  "inputs": {
+    "successful_transitions_count": 3,
+    "identity_update_threshold": 3,
+    "attempts_identity_change": true,
+    "constraint_type": "LAW",
+    "aversion": 10,
+    "aor_verified": true,
+    "aoe_valid": true,
+    "se_ready": true,
+    "see_ready": true,
+    "input_level": 12,
+    "threshold_value": 10,
+    "effort_correct": true,
+    "transition_phase": false,
+    "confusion_reported": false
+  },
+  "operator_sequence": [
+    "op.card06_identity",
+    "op.card07_laws_rules",
+    "op.card08_action_outcome",
+    "op.card09_thresholds",
+    "op.card10_transition_ambiguity"
+  ],
+  "expected": {
+    "status": "OK",
+    "state": {
+      "identity_update_allowed": true,
+      "constraint_classified": true,
+      "action_outcome_ready": true,
+      "threshold_state": "POST_THRESHOLD",
+      "ambiguity_class": "NO_TRANSITION_SIGNAL"
+    }
+  }
+}

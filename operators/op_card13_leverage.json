@@ -1,0 +1,26 @@
+{
+  "id": "op.card13_leverage",
+  "name": "Card 13: Leverage",
+  "rules": [
+    {
+      "when": "effort > 0",
+      "set_expr": {
+        "efficiency": "displacement / effort"
+      }
+    },
+    {
+      "when": "true",
+      "set": {
+        "efficiency": 0
+      }
+    }
+  ],
+  "gates": [
+    {
+      "id": "gate.low_valence_seek_leverage",
+      "when": "resulting_valence <= 0",
+      "action": "BLOCK_PROGRESS",
+      "message": "If resulting valence is non-positive, seek structural leverage instead of increasing effort."
+    }
+  ]
+}

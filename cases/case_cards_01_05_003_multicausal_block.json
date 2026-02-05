@@ -1,0 +1,36 @@
+{
+  "case_id": "case_cards_01_05_003_multicausal_block",
+  "inputs": {
+    "state_value": 8,
+    "standard_value": 12,
+    "state_unit": "revenue_k",
+    "standard_unit": "revenue_k",
+    "state_is_verifiable": true,
+    "attraction": 90,
+    "aversion": 25,
+    "p_success": 0.6,
+    "p_failure": 0.3,
+    "cost": 8,
+    "procrastination_reported": false,
+    "controllability_scalar": 0.6,
+    "cites_external_factors": false,
+    "user_causal_weight": 0.5,
+    "delegates_to_others": true,
+    "attribution_locus": "INTERNAL",
+    "attribution_stability": "TEMPORARY",
+    "attribution_scope": "SPECIFIC"
+  },
+  "operator_sequence": [
+    "op.card01_state_standard",
+    "op.card03_controllability",
+    "op.card02_resulting_valence",
+    "op.card04_multicausality",
+    "op.card05_attribution"
+  ],
+  "expected": {
+    "status": "GATED",
+    "state": {
+      "causal_weight_ok": false
+    }
+  }
+}

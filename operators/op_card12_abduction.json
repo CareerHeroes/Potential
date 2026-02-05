@@ -1,0 +1,26 @@
+{
+  "id": "op.card12_abduction",
+  "name": "Card 12: Abduction & Experimentation",
+  "rules": [
+    {
+      "when": "demands_certainty == true",
+      "set": {
+        "hypothesis_mode": "PROVISIONAL_REQUIRED"
+      }
+    },
+    {
+      "when": "true",
+      "set": {
+        "hypothesis_mode": "PROVISIONAL"
+      }
+    }
+  ],
+  "gates": [
+    {
+      "id": "gate.certainty_block",
+      "when": "demands_certainty == true",
+      "action": "BLOCK_PROGRESS",
+      "message": "Treat the action as an experiment. Require provisional hypotheses, not certainty."
+    }
+  ]
+}

@@ -110,6 +110,10 @@ def apply_rules(op: Dict[str, Any], env: Dict[str, Any]) -> Dict[str, Any]:
             ok = bool(safe_eval(cond, env))
         if ok:
             outputs.update(rule.get("set", {}))
+            set_expr = rule.get("set_expr", {})
+            if isinstance(set_expr, dict):
+                for key, expr in set_expr.items():
+                    outputs[key] = safe_eval(str(expr), env)
             matched = True
             # first-match-wins for determinism
             break

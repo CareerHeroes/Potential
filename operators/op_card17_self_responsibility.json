@@ -1,0 +1,26 @@
+{
+  "id": "op.card17_self_responsibility",
+  "name": "Card 17: Self-Responsibility",
+  "rules": [
+    {
+      "when": "responsibility_framed_as_utility == true",
+      "set": {
+        "responsibility_frame_ok": true
+      }
+    },
+    {
+      "when": "true",
+      "set": {
+        "responsibility_frame_ok": false
+      }
+    }
+  ],
+  "gates": [
+    {
+      "id": "gate.no_moral_shaming",
+      "when": "responsibility_framed_as_utility == false or guilt_framing == true",
+      "action": "BLOCK_PROGRESS",
+      "message": "Frame responsibility as utility, not moral virtue or guilt."
+    }
+  ]
+}

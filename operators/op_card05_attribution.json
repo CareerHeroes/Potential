@@ -1,0 +1,26 @@
+{
+  "id": "op.card05_attribution",
+  "name": "Card 05: Attribution Systems",
+  "rules": [
+    {
+      "when": "attribution_locus == 'INTERNAL' and attribution_stability == 'PERMANENT' and attribution_scope == 'GLOBAL'",
+      "set": {
+        "attribution_recode_required": true
+      }
+    },
+    {
+      "when": "true",
+      "set": {
+        "attribution_recode_required": false
+      }
+    }
+  ],
+  "gates": [
+    {
+      "id": "gate.attribution_recode",
+      "when": "attribution_recode_required == true",
+      "action": "BLOCK_PROGRESS",
+      "message": "Translate permanent/global/internal attribution into temporary/specific/actionable terms."
+    }
+  ]
+}

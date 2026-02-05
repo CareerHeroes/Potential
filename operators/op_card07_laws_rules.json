@@ -1,0 +1,38 @@
+{
+  "id": "op.card07_laws_rules",
+  "name": "Card 07: Laws vs Rules",
+  "rules": [
+    {
+      "when": "constraint_type == 'RULE'",
+      "set": {
+        "constraint_classified": true
+      }
+    },
+    {
+      "when": "constraint_type == 'LAW'",
+      "set": {
+        "constraint_classified": true
+      }
+    },
+    {
+      "when": "true",
+      "set": {
+        "constraint_classified": false
+      }
+    }
+  ],
+  "gates": [
+    {
+      "id": "gate.constraint_not_classified",
+      "when": "constraint_classified == false",
+      "action": "BLOCK_PROGRESS",
+      "message": "Classify the barrier as a Law or a Rule before proceeding."
+    },
+    {
+      "id": "gate.rule_deprioritize_aversion",
+      "when": "constraint_type == 'RULE' and aversion > 0",
+      "action": "BLOCK_PROGRESS",
+      "message": "Rule constraints require aversion to be deprioritized before action planning."
+    }
+  ]
+}

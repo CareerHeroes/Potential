@@ -1,0 +1,31 @@
+{
+  "case_id": "case_cards_16_20_001_ok",
+  "inputs": {
+    "borrowed_standard_removed": true,
+    "responsibility_framed_as_utility": true,
+    "guilt_framing": false,
+    "necessary_claimed": true,
+    "alternative_sufficiencies_count": 3,
+    "behavior_stuck": false,
+    "higher_layer_conflict": false,
+    "fear_reported": false,
+    "evidence_interpreted_as_inability": false
+  },
+  "operator_sequence": [
+    "op.card16_mental_hygiene",
+    "op.card17_self_responsibility",
+    "op.card18_sufficiency",
+    "op.card19_goal_pyramid",
+    "op.card20_learning_pathways"
+  ],
+  "expected": {
+    "status": "OK",
+    "state": {
+      "hygiene_clear": true,
+      "responsibility_frame_ok": true,
+      "sufficiency_ok": true,
+      "goal_pyramid_block": false,
+      "learning_pathway_confusion": false
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "id": "op.card04_multicausality",
+  "name": "Card 04: Multi-Causality",
+  "rules": [
+    {
+      "when": "user_causal_weight == 1",
+      "set": {
+        "causal_weight_ok": true
+      }
+    },
+    {
+      "when": "true",
+      "set": {
+        "causal_weight_ok": false
+      }
+    }
+  ],
+  "gates": [
+    {
+      "id": "gate.shared_responsibility",
+      "when": "user_causal_weight < 1 or delegates_to_others == true",
+      "action": "BLOCK_PROGRESS",
+      "message": "The 50/50 excuse is not allowed. Do not delegate responsibility for the solution."
+    }
+  ]
+}

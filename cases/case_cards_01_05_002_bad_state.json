@@ -1,0 +1,36 @@
+{
+  "case_id": "case_cards_01_05_002_bad_state",
+  "inputs": {
+    "state_value": 4,
+    "standard_value": 10,
+    "state_unit": "clients",
+    "standard_unit": "clients",
+    "state_is_verifiable": false,
+    "attraction": 70,
+    "aversion": 30,
+    "p_success": 0.5,
+    "p_failure": 0.5,
+    "cost": 10,
+    "procrastination_reported": true,
+    "controllability_scalar": 0.5,
+    "cites_external_factors": false,
+    "user_causal_weight": 1,
+    "delegates_to_others": false,
+    "attribution_locus": "INTERNAL",
+    "attribution_stability": "TEMPORARY",
+    "attribution_scope": "SPECIFIC"
+  },
+  "operator_sequence": [
+    "op.card01_state_standard",
+    "op.card03_controllability",
+    "op.card02_resulting_valence",
+    "op.card04_multicausality",
+    "op.card05_attribution"
+  ],
+  "expected": {
+    "status": "GATED",
+    "state": {
+      "state_gap_defined": false
+    }
+  }
+}
