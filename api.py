@@ -17,6 +17,20 @@ class Handler(BaseHTTPRequestHandler):
     def do_OPTIONS(self):
         self._set_headers(204)
 
+    def do_HEAD(self):
+        if self.path in ("/", "/health"):
+            self._set_headers(200)
+            return
+        self._set_headers(404)
+
+    def do_GET(self):
+        if self.path in ("/", "/health"):
+            self._set_headers(200)
+            self.wfile.write(json.dumps({"status": "ok"}).encode("utf-8"))
+            return
+        self._set_headers(404)
+        self.wfile.write(json.dumps({"error": "not found"}).encode("utf-8"))
+
     def do_POST(self):
         if self.path != "/evaluate":
             self._set_headers(404)
