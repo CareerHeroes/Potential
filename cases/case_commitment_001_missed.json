@@ -1,0 +1,18 @@
+{
+  "case_id": "case_commitment_001_missed",
+  "inputs": {
+    "deadline_passed": true,
+    "commitment_status": "PENDING",
+    "outcome_matched": false
+  },
+  "operator_sequence": [
+    "op.commitment_check"
+  ],
+  "expected": {
+    "status": "GATED",
+    "state": {
+      "commitment_outcome": "MISSED",
+      "assumption_result": "REVIEW_ASSUMPTIONS"
+    }
+  }
+}

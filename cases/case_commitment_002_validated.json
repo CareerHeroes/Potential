@@ -1,0 +1,18 @@
+{
+  "case_id": "case_commitment_002_validated",
+  "inputs": {
+    "deadline_passed": true,
+    "commitment_status": "DONE",
+    "outcome_matched": true
+  },
+  "operator_sequence": [
+    "op.commitment_check"
+  ],
+  "expected": {
+    "status": "OK",
+    "state": {
+      "commitment_outcome": "DONE",
+      "assumption_result": "ASSUMPTIONS_VALIDATED"
+    }
+  }
+}

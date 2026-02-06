@@ -1,0 +1,48 @@
+{
+  "id": "op.commitment_check",
+  "name": "Commitment Check",
+  "rules": [
+    {
+      "when": "deadline_passed == true and commitment_status != 'DONE'",
+      "set": {
+        "commitment_outcome": "MISSED",
+        "assumption_result": "REVIEW_ASSUMPTIONS"
+      }
+    },
+    {
+      "when": "commitment_status == 'DONE' and outcome_matched == true",
+      "set": {
+        "commitment_outcome": "DONE",
+        "assumption_result": "ASSUMPTIONS_VALIDATED"
+      }
+    },
+    {
+      "when": "commitment_status == 'DONE' and outcome_matched == false",
+      "set": {
+        "commitment_outcome": "DONE",
+        "assumption_result": "ASSUMPTIONS_FALSIFIED"
+      }
+    },
+    {
+      "when": "true",
+      "set": {
+        "commitment_outcome": "PENDING",
+        "assumption_result": "PENDING"
+      }
+    }
+  ],
+  "gates": [
+    {
+      "id": "gate.review_assumptions",
+      "when": "assumption_result == 'REVIEW_ASSUMPTIONS'",
+      "action": "REQUIRE_COMMITMENT",
+      "message": "Commitment missed. Review and update the assumptions or adjust the plan."
+    },
+    {
+      "id": "gate.falsified_assumptions",
+      "when": "assumption_result == 'ASSUMPTIONS_FALSIFIED'",
+      "action": "REQUIRE_COMMITMENT",
+      "message": "Outcome did not match. Update assumptions and specify the next test."
+    }
+  ]
+}

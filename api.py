@@ -223,6 +223,11 @@ OPERATOR_INPUTS = {
         "commitment_action_defined",
         "commitment_timeframe_defined",
         "success_criteria_defined"
+    ],
+    "op.commitment_check": [
+        "deadline_passed",
+        "commitment_status",
+        "outcome_matched"
     ]
 }
 
@@ -264,7 +269,7 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(json.dumps({"error": "not found"}).encode("utf-8"))
 
     def do_POST(self):
-        if self.path not in ("/evaluate", "/route", "/route_and_evaluate"):
+        if self.path not in ("/evaluate", "/route", "/route_and_evaluate", "/commitment_check"):
             self._set_headers(404)
             self.wfile.write(json.dumps({"error": "not found"}).encode("utf-8"))
             return
@@ -292,6 +297,28 @@ class Handler(BaseHTTPRequestHandler):
             result = route_operators(inputs, top_n)
             self._set_headers(200)
             self.wfile.write(json.dumps(result).encode("utf-8"))
+            return
+
+        if self.path == "/commitment_check":
+            sequence = ["op.commitment_check"]
+            case_id = payload.get("case_id", "commitment_case")
+            missing = missing_inputs_for(sequence, inputs)
+            if missing:
+                self._set_headers(200)
+                self.wfile.write(json.dumps({"status": "NEEDS_INPUTS", "missing_inputs": missing}).encode("utf-8"))
+                return
+
+            base_dir = os.path.dirname(os.path.abspath(__file__))
+            operators_dir = os.path.join(base_dir, "operators")
+            try:
+                result = engine.run_inputs(case_id, inputs, sequence, operators_dir)
+            except Exception as exc:
+                self._set_headers(400)
+                self.wfile.write(json.dumps({"error": str(exc)}).encode("utf-8"))
+                return
+
+            self._set_headers(200)
+            self.wfile.write(json.dumps({"result": result}).encode("utf-8"))
             return
 
         if self.path == "/route_and_evaluate":
