@@ -1,0 +1,17 @@
+{
+  "case_id": "case_conclusion_001_wrap",
+  "inputs": {
+    "commitment_action_defined": true,
+    "commitment_timeframe_defined": true,
+    "success_criteria_defined": true
+  },
+  "operator_sequence": [
+    "op.conclusion_detection"
+  ],
+  "expected": {
+    "status": "GATED",
+    "state": {
+      "conclusion_ready": true
+    }
+  }
+}

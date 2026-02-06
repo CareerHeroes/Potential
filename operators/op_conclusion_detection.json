@@ -1,0 +1,26 @@
+{
+  "id": "op.conclusion_detection",
+  "name": "Conclusion Detection",
+  "rules": [
+    {
+      "when": "commitment_action_defined == true and commitment_timeframe_defined == true and success_criteria_defined == true",
+      "set": {
+        "conclusion_ready": true
+      }
+    },
+    {
+      "when": "true",
+      "set": {
+        "conclusion_ready": false
+      }
+    }
+  ],
+  "gates": [
+    {
+      "id": "gate.wrap_up",
+      "when": "conclusion_ready == true",
+      "action": "REQUIRE_COMMITMENT",
+      "message": "Commitment captured. Offer wrap-up and save the plan (action, timeframe, success criteria)."
+    }
+  ]
+}

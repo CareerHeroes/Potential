@@ -73,5 +73,8 @@
     "op.card09_thresholds",
     "op.card13_leverage",
     "op.card15_mental_immune"
+  ],
+  "conclusion_wrap": [
+    "op.conclusion_detection"
   ]
 }

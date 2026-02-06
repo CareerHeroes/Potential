@@ -89,6 +89,11 @@ def route_operators(inputs: dict, top_n: int) -> dict:
         scores["op.card19_goal_pyramid"] += 30
     if inputs.get("fear_reported") is True and inputs.get("evidence_interpreted_as_inability") is True:
         scores["op.card20_learning_pathways"] += 20
+    if (
+        inputs.get("commitment_action_defined") is True
+        and inputs.get("commitment_timeframe_defined") is True
+    ):
+        scores["op.conclusion_detection"] = 30
 
     ranked = sorted(scores.items(), key=lambda item: item[1], reverse=True)
     top = [op for op, score in ranked if score > 0][:top_n]
@@ -99,6 +104,12 @@ def route_operators(inputs: dict, top_n: int) -> dict:
 
 
 def recommend_phase(inputs: dict) -> str:
+    if (
+        inputs.get("potential_building_effort_low") is True
+        or inputs.get("quality_impact_high") is True
+        or inputs.get("user_reasoning_sound") is True
+    ):
+        return "BUILD_POTENTIAL"
     if (
         inputs.get("state_gap_defined") is False
         or inputs.get("aor_verified") is False
@@ -207,6 +218,11 @@ OPERATOR_INPUTS = {
     "op.card20_learning_pathways": [
         "fear_reported",
         "evidence_interpreted_as_inability"
+    ],
+    "op.conclusion_detection": [
+        "commitment_action_defined",
+        "commitment_timeframe_defined",
+        "success_criteria_defined"
     ]
 }
 
