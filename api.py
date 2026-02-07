@@ -120,6 +120,62 @@ def recommend_phase(inputs: dict) -> str:
     return "CONVERT_TO_KINETIC"
 
 
+PHASE_SIGNAL_KEYS = [
+    "state_gap_defined",
+    "aor_verified",
+    "controllability_scalar",
+    "resulting_valence",
+    "action_defined",
+    "success_signal_defined",
+    "adaptation_defined",
+    "acted_recently",
+    "potential_building_effort_low",
+    "quality_impact_high",
+    "user_reasoning_sound"
+]
+
+
+def phase_confidence(inputs: dict, phase: str) -> dict:
+    present = [key for key in PHASE_SIGNAL_KEYS if key in inputs]
+    completeness = int((len(present) / len(PHASE_SIGNAL_KEYS)) * 40)
+
+    contradictions = 0
+    if inputs.get("action_defined") is False and inputs.get("success_signal_defined") is True:
+        contradictions += 1
+    if inputs.get("action_defined") is False and inputs.get("adaptation_defined") is True:
+        contradictions += 1
+    if inputs.get("state_is_verifiable") is False and inputs.get("state_gap_defined") is True:
+        contradictions += 1
+    if inputs.get("procrastination_reported") is True and inputs.get("resulting_valence", 1) > 0:
+        contradictions += 1
+    consistency = max(0, 30 - (contradictions * 10))
+
+    stability = 0
+    prev_phase = inputs.get("phase_recommendation_prev")
+    if prev_phase in ("BUILD_POTENTIAL", "CONVERT_TO_KINETIC"):
+        stability = 20 if prev_phase == phase else 10
+
+    loop_closure = 0
+    if (
+        inputs.get("action_defined") is True
+        and inputs.get("success_signal_defined") is True
+        and inputs.get("adaptation_defined") is True
+    ):
+        loop_closure = 10
+
+    total = completeness + consistency + stability + loop_closure
+    return {
+        "score": total,
+        "reasons": {
+            "completeness": completeness,
+            "consistency": consistency,
+            "stability": stability,
+            "loop_closure": loop_closure,
+            "contradictions": contradictions
+        }
+    }
+
+
 OPERATOR_INPUTS = {
     "op.card01_state_standard": [
         "state_value",
@@ -327,6 +383,7 @@ class Handler(BaseHTTPRequestHandler):
                 top_n = 3
             routed = route_operators(inputs, top_n)
             phase = recommend_phase(inputs)
+            confidence = phase_confidence(inputs, phase)
             sequence = routed.get("operators", [])
             case_id = payload.get("case_id", "api_case")
 
@@ -342,6 +399,7 @@ class Handler(BaseHTTPRequestHandler):
                     "status": "NEEDS_INPUTS",
                     "route": routed,
                     "phase_recommendation": phase,
+                    "phase_confidence": confidence,
                     "missing_inputs": missing
                 }).encode("utf-8"))
                 return
@@ -356,7 +414,12 @@ class Handler(BaseHTTPRequestHandler):
                 return
 
             self._set_headers(200)
-            self.wfile.write(json.dumps({"route": routed, "phase_recommendation": phase, "result": result}).encode("utf-8"))
+            self.wfile.write(json.dumps({
+                "route": routed,
+                "phase_recommendation": phase,
+                "phase_confidence": confidence,
+                "result": result
+            }).encode("utf-8"))
             return
 
         sequence = payload.get("operator_sequence")
