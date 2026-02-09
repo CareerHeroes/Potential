@@ -1,0 +1,38 @@
+{
+  "id": "op.velocity_definition",
+  "name": "Velocity Definition",
+  "rules": [
+    {
+      "when": "goal_defined == true and motion_coherent == true and displacement_observed == true",
+      "set": {
+        "velocity_classification": "COHERENT_PROGRESS"
+      }
+    },
+    {
+      "when": "goal_defined == true and displacement_observed == false and internal_motion == true",
+      "set": {
+        "velocity_classification": "INTERNAL_POTENTIAL_BUILD"
+      }
+    },
+    {
+      "when": "goal_defined == false and motion_coherent == false",
+      "set": {
+        "velocity_classification": "NOISE"
+      }
+    },
+    {
+      "when": "true",
+      "set": {
+        "velocity_classification": "UNCLASSIFIED"
+      }
+    }
+  ],
+  "gates": [
+    {
+      "id": "gate.activity_without_velocity",
+      "when": "velocity_classification == 'NOISE'",
+      "action": "BLOCK_PROGRESS",
+      "message": "Activity without defined goal is noise, not velocity. Define the goal first."
+    }
+  ]
+}

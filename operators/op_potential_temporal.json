@@ -1,0 +1,25 @@
+{
+  "id": "op.potential_temporal",
+  "name": "Potential vs Kinetic Temporal Rule",
+  "rules": [
+    {
+      "when": "internal_kinetic_spent == true and capacity_increased == true",
+      "set": {
+        "potential_classification": "POTENTIAL_INCREASED"
+      }
+    },
+    {
+      "when": "internal_kinetic_spent == true and capacity_increased == false",
+      "set": {
+        "potential_classification": "KINETIC_SPENT_NO_STORAGE"
+      }
+    },
+    {
+      "when": "true",
+      "set": {
+        "potential_classification": "NO_CHANGE"
+      }
+    }
+  ],
+  "gates": []
+}

@@ -37,6 +37,12 @@ def route_operators(inputs: dict, top_n: int) -> dict:
         "op.card18_sufficiency": 0,
         "op.card19_goal_pyramid": 0,
         "op.card20_learning_pathways": 0
+        ,
+        "op.work_rule": 0,
+        "op.potential_temporal": 0,
+        "op.constraint_release": 0,
+        "op.velocity_definition": 0,
+        "op.homeostasis_clarification": 0
     }
 
     if inputs.get("state_is_verifiable") is False or inputs.get("standard_value") in (None, ""):
@@ -89,6 +95,16 @@ def route_operators(inputs: dict, top_n: int) -> dict:
         scores["op.card19_goal_pyramid"] += 30
     if inputs.get("fear_reported") is True and inputs.get("evidence_interpreted_as_inability") is True:
         scores["op.card20_learning_pathways"] += 20
+    if inputs.get("energy_expended") is True and inputs.get("displacement_observed") is False:
+        scores["op.work_rule"] += 30
+    if inputs.get("internal_kinetic_spent") is True and inputs.get("capacity_increased") is True:
+        scores["op.potential_temporal"] += 20
+    if inputs.get("constraints_lowered") is True and inputs.get("impulsive_action_observed") is True:
+        scores["op.constraint_release"] += 25
+    if inputs.get("goal_defined") is False and inputs.get("motion_coherent") is False:
+        scores["op.velocity_definition"] += 20
+    if inputs.get("short_term_imbalance_for_long_term_stability") is True:
+        scores["op.homeostasis_clarification"] += 15
     if (
         inputs.get("commitment_action_defined") is True
         and inputs.get("commitment_timeframe_defined") is True
@@ -284,6 +300,27 @@ OPERATOR_INPUTS = {
         "deadline_passed",
         "commitment_status",
         "outcome_matched"
+    ],
+    "op.work_rule": [
+        "energy_expended",
+        "displacement_observed"
+    ],
+    "op.potential_temporal": [
+        "internal_kinetic_spent",
+        "capacity_increased"
+    ],
+    "op.constraint_release": [
+        "constraints_lowered",
+        "impulsive_action_observed"
+    ],
+    "op.velocity_definition": [
+        "goal_defined",
+        "motion_coherent",
+        "displacement_observed",
+        "internal_motion"
+    ],
+    "op.homeostasis_clarification": [
+        "short_term_imbalance_for_long_term_stability"
     ]
 }
 

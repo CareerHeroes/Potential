@@ -1,0 +1,32 @@
+{
+  "id": "op.work_rule",
+  "name": "Work Rule: Displacement Required",
+  "rules": [
+    {
+      "when": "energy_expended == true and displacement_observed == false",
+      "set": {
+        "progress_classification": "BURN_NO_PROGRESS"
+      }
+    },
+    {
+      "when": "energy_expended == true and displacement_observed == true",
+      "set": {
+        "progress_classification": "DISPLACEMENT_PROGRESS"
+      }
+    },
+    {
+      "when": "true",
+      "set": {
+        "progress_classification": "NO_ENERGY_NO_PROGRESS"
+      }
+    }
+  ],
+  "gates": [
+    {
+      "id": "gate.no_displacement",
+      "when": "energy_expended == true and displacement_observed == false",
+      "action": "BLOCK_PROGRESS",
+      "message": "Energy without displacement is not progress. Identify the blocked threshold."
+    }
+  ]
+}

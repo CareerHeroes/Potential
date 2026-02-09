@@ -1,0 +1,16 @@
+{
+  "case_id": "case_addendum_003_constraint_release",
+  "inputs": {
+    "constraints_lowered": true,
+    "impulsive_action_observed": true
+  },
+  "operator_sequence": [
+    "op.constraint_release"
+  ],
+  "expected": {
+    "status": "GATED",
+    "state": {
+      "release_classification": "CONSTRAINT_RELEASE"
+    }
+  }
+}

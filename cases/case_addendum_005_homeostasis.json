@@ -1,0 +1,15 @@
+{
+  "case_id": "case_addendum_005_homeostasis",
+  "inputs": {
+    "short_term_imbalance_for_long_term_stability": true
+  },
+  "operator_sequence": [
+    "op.homeostasis_clarification"
+  ],
+  "expected": {
+    "status": "OK",
+    "state": {
+      "homeostasis_alignment": "ALIGNED"
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "case_id": "case_addendum_002_temporal",
+  "inputs": {
+    "internal_kinetic_spent": true,
+    "capacity_increased": true
+  },
+  "operator_sequence": [
+    "op.potential_temporal"
+  ],
+  "expected": {
+    "status": "OK",
+    "state": {
+      "potential_classification": "POTENTIAL_INCREASED"
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "case_id": "case_addendum_001_work_rule",
+  "inputs": {
+    "energy_expended": true,
+    "displacement_observed": false
+  },
+  "operator_sequence": [
+    "op.work_rule"
+  ],
+  "expected": {
+    "status": "GATED",
+    "state": {
+      "progress_classification": "BURN_NO_PROGRESS"
+    }
+  }
+}

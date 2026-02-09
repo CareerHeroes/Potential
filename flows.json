@@ -79,5 +79,12 @@
   ],
   "commitment_check": [
     "op.commitment_check"
+  ],
+  "addendum_energy_motion": [
+    "op.work_rule",
+    "op.potential_temporal",
+    "op.constraint_release",
+    "op.velocity_definition",
+    "op.homeostasis_clarification"
   ]
 }

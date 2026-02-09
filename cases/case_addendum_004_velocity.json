@@ -1,0 +1,18 @@
+{
+  "case_id": "case_addendum_004_velocity",
+  "inputs": {
+    "goal_defined": false,
+    "motion_coherent": false,
+    "displacement_observed": false,
+    "internal_motion": false
+  },
+  "operator_sequence": [
+    "op.velocity_definition"
+  ],
+  "expected": {
+    "status": "GATED",
+    "state": {
+      "velocity_classification": "NOISE"
+    }
+  }
+}

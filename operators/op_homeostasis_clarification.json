@@ -1,0 +1,19 @@
+{
+  "id": "op.homeostasis_clarification",
+  "name": "Homeostasis Clarification",
+  "rules": [
+    {
+      "when": "short_term_imbalance_for_long_term_stability == true",
+      "set": {
+        "homeostasis_alignment": "ALIGNED"
+      }
+    },
+    {
+      "when": "true",
+      "set": {
+        "homeostasis_alignment": "UNKNOWN"
+      }
+    }
+  ],
+  "gates": []
+}

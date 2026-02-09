@@ -1,0 +1,26 @@
+{
+  "id": "op.constraint_release",
+  "name": "Constraint Release Rule",
+  "rules": [
+    {
+      "when": "constraints_lowered == true and impulsive_action_observed == true",
+      "set": {
+        "release_classification": "CONSTRAINT_RELEASE"
+      }
+    },
+    {
+      "when": "true",
+      "set": {
+        "release_classification": "NO_RELEASE"
+      }
+    }
+  ],
+  "gates": [
+    {
+      "id": "gate.constraint_release",
+      "when": "release_classification == 'CONSTRAINT_RELEASE'",
+      "action": "BLOCK_PROGRESS",
+      "message": "Impulsivity indicates constraint failure, not value change. Stabilize constraints first."
+    }
+  ]
+}
