@@ -196,6 +196,43 @@ def phase_confidence(inputs: dict, phase: str) -> dict:
     }
 
 
+def infer_capacity_phase(inputs: dict) -> str:
+    action_defined = inputs.get("action_defined")
+    signal_defined = inputs.get("success_signal_defined")
+    adaptation_defined = inputs.get("adaptation_defined")
+    acted_recently = inputs.get("acted_recently")
+
+    if action_defined is False or signal_defined is False or adaptation_defined is False:
+        return "RAW_CAPACITY"
+    if action_defined is True and signal_defined is True and adaptation_defined is True and acted_recently is False:
+        return "STRUCTURED_POTENTIAL"
+    if action_defined is True and signal_defined is True and adaptation_defined is True and acted_recently is True:
+        return "KINETIC_EXECUTION"
+    return "UNKNOWN"
+
+
+def reconcile_final_recommendation(capacity_phase: str, ready_to_act: bool) -> dict:
+    if capacity_phase in ("RAW_CAPACITY", "STRUCTURED_POTENTIAL"):
+        return {
+            "mode": "INTERNAL_KINETIC",
+            "reason": f"capacity_phase={capacity_phase}"
+        }
+    if capacity_phase == "KINETIC_EXECUTION":
+        if ready_to_act:
+            return {
+                "mode": "EXTERNAL_KINETIC",
+                "reason": "capacity_phase=KINETIC_EXECUTION and ready_to_act=true"
+            }
+        return {
+            "mode": "INTERNAL_KINETIC",
+            "reason": "capacity_phase=KINETIC_EXECUTION but ready_to_act=false"
+        }
+    return {
+        "mode": "INTERNAL_KINETIC",
+        "reason": "capacity_phase=UNKNOWN"
+    }
+
+
 OPERATOR_INPUTS = {
     "op.card01_state_standard": [
         "state_value",
@@ -736,6 +773,8 @@ class Handler(BaseHTTPRequestHandler):
                 else:
                     energy = apply_ema(case_id, energy)
                 fulcrums = identify_fulcrums(inputs, provided)
+                capacity_phase = infer_capacity_phase(inputs)
+                final_recommendation = reconcile_final_recommendation(capacity_phase, energy["ready_to_act"])
                 self._set_headers(200)
                 self.wfile.write(json.dumps({
                     "status": "NEEDS_INPUTS",
@@ -744,7 +783,9 @@ class Handler(BaseHTTPRequestHandler):
                     "phase_confidence": confidence,
                     "missing_inputs": missing,
                     "computed_energy": energy,
-                    "fulcrums": fulcrums
+                    "fulcrums": fulcrums,
+                    "capacity_phase": capacity_phase,
+                    "final_recommendation": final_recommendation
                 }).encode("utf-8"))
                 return
 
@@ -765,6 +806,8 @@ class Handler(BaseHTTPRequestHandler):
             else:
                 energy = apply_ema(case_id, energy)
             fulcrums = identify_fulcrums(inputs, provided)
+            capacity_phase = infer_capacity_phase(inputs)
+            final_recommendation = reconcile_final_recommendation(capacity_phase, energy["ready_to_act"])
             self._set_headers(200)
             self.wfile.write(json.dumps({
                 "route": routed,
@@ -772,7 +815,9 @@ class Handler(BaseHTTPRequestHandler):
                 "phase_confidence": confidence,
                 "result": result,
                 "computed_energy": energy,
-                "fulcrums": fulcrums
+                "fulcrums": fulcrums,
+                "capacity_phase": capacity_phase,
+                "final_recommendation": final_recommendation
             }).encode("utf-8"))
             return
 
