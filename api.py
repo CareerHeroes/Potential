@@ -507,11 +507,16 @@ def apply_ema(case_id: str, energy: dict) -> dict:
     if not prev:
         _PREV_SCORES[case_id] = energy
         return energy
+    return apply_ema_with_prev(case_id, energy, prev)
+
+
+def apply_ema_with_prev(case_id: str, energy: dict, prev: dict) -> dict:
     blended = {}
     for key in ("potential", "utilization", "gap"):
         blended[key] = int(round(0.4 * energy[key] + 0.6 * prev.get(key, energy[key])))
     blended["ready_to_act"] = bool(blended["utilization"] >= 55 and blended["gap"] < 35)
-    _PREV_SCORES[case_id] = blended
+    if case_id:
+        _PREV_SCORES[case_id] = blended
     return blended
 
 
@@ -641,7 +646,7 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(json.dumps({"error": "not found"}).encode("utf-8"))
 
     def do_POST(self):
-        if self.path not in ("/evaluate", "/route", "/route_and_evaluate", "/commitment_check"):
+        if self.path not in ("/evaluate", "/route", "/route_and_evaluate", "/commitment_check", "/smooth_energy"):
             self._set_headers(404)
             self.wfile.write(json.dumps({"error": "not found"}).encode("utf-8"))
             return
@@ -694,6 +699,19 @@ class Handler(BaseHTTPRequestHandler):
             self.wfile.write(json.dumps({"result": result}).encode("utf-8"))
             return
 
+        if self.path == "/smooth_energy":
+            current = payload.get("current_energy")
+            previous = payload.get("previous_energy")
+            case_id = payload.get("case_id", "")
+            if not isinstance(current, dict) or not isinstance(previous, dict):
+                self._set_headers(400)
+                self.wfile.write(json.dumps({"error": "current_energy and previous_energy must be objects"}).encode("utf-8"))
+                return
+            blended = apply_ema_with_prev(case_id, current, previous)
+            self._set_headers(200)
+            self.wfile.write(json.dumps({"computed_energy": blended}).encode("utf-8"))
+            return
+
         if self.path == "/route_and_evaluate":
             top_n = payload.get("top_n", 3)
             if not isinstance(top_n, int) or top_n <= 0:
@@ -712,7 +730,11 @@ class Handler(BaseHTTPRequestHandler):
             missing = missing_inputs_for(sequence, inputs)
             if missing:
                 energy = compute_energy(inputs, provided, 0, "NEEDS_INPUTS")
-                energy = apply_ema(case_id, energy)
+                prev_energy = payload.get("previous_energy")
+                if isinstance(prev_energy, dict):
+                    energy = apply_ema_with_prev(case_id, energy, prev_energy)
+                else:
+                    energy = apply_ema(case_id, energy)
                 fulcrums = identify_fulcrums(inputs, provided)
                 self._set_headers(200)
                 self.wfile.write(json.dumps({
@@ -737,7 +759,11 @@ class Handler(BaseHTTPRequestHandler):
 
             gates_count = len(result.get("gates_triggered", []))
             energy = compute_energy(inputs, provided, gates_count, result.get("status"))
-            energy = apply_ema(case_id, energy)
+            prev_energy = payload.get("previous_energy")
+            if isinstance(prev_energy, dict):
+                energy = apply_ema_with_prev(case_id, energy, prev_energy)
+            else:
+                energy = apply_ema(case_id, energy)
             fulcrums = identify_fulcrums(inputs, provided)
             self._set_headers(200)
             self.wfile.write(json.dumps({
