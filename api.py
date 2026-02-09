@@ -155,42 +155,84 @@ PHASE_SIGNAL_KEYS = [
 ]
 
 
-def phase_confidence(inputs: dict, phase: str) -> dict:
-    present = [key for key in PHASE_SIGNAL_KEYS if key in inputs]
-    completeness = int((len(present) / len(PHASE_SIGNAL_KEYS)) * 40)
+def _weighted_completeness(provided: set) -> int:
+    core = {
+        "state_is_verifiable": 3,
+        "standard_value": 3,
+        "resulting_valence": 3,
+        "controllability_scalar": 3,
+        "p_success": 3
+    }
+    supporting = {
+        "attribution_universal_helplessness": 1,
+        "attribution_conditionality_defined": 1,
+        "attribution_action_outcome_preserved": 1,
+        "attribution_learnable_component": 1,
+        "attempts_identity_change": 1,
+        "successful_transitions_count": 1,
+        "constraint_type": 1,
+        "aor_verified": 1,
+        "action_defined": 1,
+        "success_signal_defined": 1,
+        "adaptation_defined": 1
+    }
+    total_weight = sum(core.values()) + sum(supporting.values())
+    filled_weight = sum(weight for key, weight in core.items() if key in provided)
+    filled_weight += sum(weight for key, weight in supporting.items() if key in provided)
+    if total_weight == 0:
+        return 0
+    return int(round((filled_weight / total_weight) * 100))
 
+
+def _count_contradictions(inputs: dict, provided: set) -> int:
     contradictions = 0
-    if inputs.get("action_defined") is False and inputs.get("success_signal_defined") is True:
-        contradictions += 1
-    if inputs.get("action_defined") is False and inputs.get("adaptation_defined") is True:
-        contradictions += 1
-    if inputs.get("state_is_verifiable") is False and inputs.get("state_gap_defined") is True:
-        contradictions += 1
-    if inputs.get("procrastination_reported") is True and inputs.get("resulting_valence", 1) > 0:
-        contradictions += 1
-    consistency = max(0, 30 - (contradictions * 10))
+    if "action_defined" in provided and "success_signal_defined" in provided:
+        if inputs.get("action_defined") is False and inputs.get("success_signal_defined") is True:
+            contradictions += 1
+    if "action_defined" in provided and "adaptation_defined" in provided:
+        if inputs.get("action_defined") is False and inputs.get("adaptation_defined") is True:
+            contradictions += 1
+    if "state_is_verifiable" in provided and "state_gap_defined" in provided:
+        if inputs.get("state_is_verifiable") is False and inputs.get("state_gap_defined") is True:
+            contradictions += 1
+    if "procrastination_reported" in provided and "resulting_valence" in provided:
+        if inputs.get("procrastination_reported") is True and _normalize_valence(inputs.get("resulting_valence", 1)) > 0:
+            contradictions += 1
+    return contradictions
 
-    stability = 0
-    prev_phase = inputs.get("phase_recommendation_prev")
-    if prev_phase in ("BUILD_POTENTIAL", "CONVERT_TO_KINETIC"):
-        stability = 20 if prev_phase == phase else 10
 
-    loop_closure = 0
-    if (
-        inputs.get("action_defined") is True
-        and inputs.get("success_signal_defined") is True
-        and inputs.get("adaptation_defined") is True
-    ):
-        loop_closure = 10
+def _stability_from_energy(previous_energy: dict, current_energy: dict) -> int:
+    if not isinstance(previous_energy, dict):
+        return 30
+    deltas = []
+    for key in ("potential", "utilization", "gap"):
+        if key in previous_energy and key in current_energy:
+            deltas.append(abs(current_energy[key] - previous_energy[key]))
+    if not deltas:
+        return 30
+    avg_delta = sum(deltas) / len(deltas)
+    if avg_delta <= 5:
+        return 90
+    if avg_delta <= 10:
+        return 70
+    if avg_delta <= 20:
+        return 40
+    return 10
 
-    total = completeness + consistency + stability + loop_closure
+
+def phase_confidence(inputs: dict, provided: set, phase: str, current_energy: dict, previous_energy: dict) -> dict:
+    completeness = _weighted_completeness(provided)
+    contradictions = _count_contradictions(inputs, provided)
+    coherence = max(0, 100 - (contradictions * 25))
+    stability = _stability_from_energy(previous_energy, current_energy)
+
+    score = int(round(0.5 * completeness + 0.3 * stability + 0.2 * coherence))
     return {
-        "score": total,
+        "score": score,
         "reasons": {
             "completeness": completeness,
-            "consistency": consistency,
+            "coherence": coherence,
             "stability": stability,
-            "loop_closure": loop_closure,
             "contradictions": contradictions
         }
     }
@@ -774,7 +816,6 @@ class Handler(BaseHTTPRequestHandler):
                 top_n = 3
             routed = route_operators(inputs, top_n)
             phase = recommend_phase(inputs)
-            confidence = phase_confidence(inputs, phase)
             sequence = routed.get("operators", [])
             case_id = payload.get("case_id", "api_case")
 
@@ -791,6 +832,7 @@ class Handler(BaseHTTPRequestHandler):
                     energy = apply_ema_with_prev(case_id, energy, prev_energy)
                 else:
                     energy = apply_ema(case_id, energy)
+                confidence = phase_confidence(inputs, provided, phase, energy, prev_energy)
                 energy = apply_contradiction_penalty(energy, confidence["reasons"]["contradictions"])
                 fulcrums = identify_fulcrums(inputs, provided)
                 capacity_phase = infer_capacity_phase(inputs)
@@ -825,6 +867,7 @@ class Handler(BaseHTTPRequestHandler):
                 energy = apply_ema_with_prev(case_id, energy, prev_energy)
             else:
                 energy = apply_ema(case_id, energy)
+            confidence = phase_confidence(inputs, provided, phase, energy, prev_energy)
             energy = apply_contradiction_penalty(energy, confidence["reasons"]["contradictions"])
             fulcrums = identify_fulcrums(inputs, provided)
             capacity_phase = capacity_phase_from_result(result) or infer_capacity_phase(inputs)
