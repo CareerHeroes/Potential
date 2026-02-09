@@ -233,6 +233,25 @@ def reconcile_final_recommendation(capacity_phase: str, ready_to_act: bool) -> d
     }
 
 
+def capacity_phase_from_result(result: dict) -> str:
+    for entry in result.get("operators_ran", []):
+        if entry.get("operator") == "op.card08_1_capacity_phase":
+            outputs = entry.get("outputs", {})
+            if "capacity_phase" in outputs:
+                return outputs["capacity_phase"]
+    return ""
+
+
+def apply_contradiction_penalty(energy: dict, contradictions: int) -> dict:
+    if contradictions <= 0:
+        return energy
+    penalty = min(contradictions * 5, 15)
+    energy["utilization"] = int(_cap(energy["utilization"] - penalty, 0, 100))
+    energy["gap"] = int(_cap(energy["potential"] - energy["utilization"]))
+    energy["ready_to_act"] = bool(energy["utilization"] >= 55 and energy["gap"] < 35)
+    return energy
+
+
 OPERATOR_INPUTS = {
     "op.card01_state_standard": [
         "state_value",
@@ -772,6 +791,7 @@ class Handler(BaseHTTPRequestHandler):
                     energy = apply_ema_with_prev(case_id, energy, prev_energy)
                 else:
                     energy = apply_ema(case_id, energy)
+                energy = apply_contradiction_penalty(energy, confidence["reasons"]["contradictions"])
                 fulcrums = identify_fulcrums(inputs, provided)
                 capacity_phase = infer_capacity_phase(inputs)
                 final_recommendation = reconcile_final_recommendation(capacity_phase, energy["ready_to_act"])
@@ -805,8 +825,9 @@ class Handler(BaseHTTPRequestHandler):
                 energy = apply_ema_with_prev(case_id, energy, prev_energy)
             else:
                 energy = apply_ema(case_id, energy)
+            energy = apply_contradiction_penalty(energy, confidence["reasons"]["contradictions"])
             fulcrums = identify_fulcrums(inputs, provided)
-            capacity_phase = infer_capacity_phase(inputs)
+            capacity_phase = capacity_phase_from_result(result) or infer_capacity_phase(inputs)
             final_recommendation = reconcile_final_recommendation(capacity_phase, energy["ready_to_act"])
             self._set_headers(200)
             self.wfile.write(json.dumps({
