@@ -54,9 +54,13 @@ def route_operators(inputs: dict, top_n: int) -> dict:
     if inputs.get("delegates_to_others") is True or inputs.get("user_causal_weight", 1) < 1:
         scores["op.card04_multicausality"] += 30
     if (
-        inputs.get("attribution_locus") == "INTERNAL"
-        and inputs.get("attribution_stability") == "PERMANENT"
-        and inputs.get("attribution_scope") == "GLOBAL"
+        inputs.get("attribution_universal_helplessness") is True
+        or inputs.get("attribution_action_outcome_preserved") is False
+        or inputs.get("attribution_learnable_component") is False
+        or (
+            inputs.get("attribution_locus") in ("EXTERNAL", "INTERACTIONAL")
+            and inputs.get("attribution_conditionality_defined") is False
+        )
     ):
         scores["op.card05_attribution"] += 30
     if inputs.get("attempts_identity_change") is True and inputs.get("successful_transitions_count", 0) < inputs.get("identity_update_threshold", 1):
@@ -222,7 +226,11 @@ OPERATOR_INPUTS = {
     "op.card05_attribution": [
         "attribution_locus",
         "attribution_stability",
-        "attribution_scope"
+        "attribution_scope",
+        "attribution_universal_helplessness",
+        "attribution_conditionality_defined",
+        "attribution_action_outcome_preserved",
+        "attribution_learnable_component"
     ],
     "op.card06_identity": [
         "successful_transitions_count",
@@ -363,17 +371,6 @@ def compute_energy(inputs: dict, provided: set, gates_count: int, status: str) -
         potential += _cap(float(inputs.get("controllability_scalar", 0)) * 20, 0, 20)
     if "user_causal_weight" in provided:
         potential += _cap(float(inputs.get("user_causal_weight", 0)) * 10, 0, 10)
-    if "attribution_locus" in provided and inputs.get("attribution_locus") != "EXTERNAL":
-        potential += 5
-
-    # Attribution style (max 20)
-    if "attribution_locus" in provided and inputs.get("attribution_locus") == "INTERNAL":
-        potential += 8
-    if "attribution_stability" in provided and inputs.get("attribution_stability") == "STABLE":
-        potential += 6
-    if "attribution_scope" in provided and inputs.get("attribution_scope") == "GLOBAL":
-        potential += 6
-
     # Identity capacity (max 10)
     if "attempts_identity_change" in provided and inputs.get("attempts_identity_change") is True:
         potential += 3
@@ -560,15 +557,22 @@ def identify_fulcrums(inputs: dict, provided: set) -> list:
             "action_hint": "What is one thing you can change right now, even if small?"
         })
     if (
-        "attribution_locus" in provided
-        and inputs.get("attribution_locus") == "EXTERNAL"
+        ("attribution_universal_helplessness" in provided and inputs.get("attribution_universal_helplessness") is True)
+        or ("attribution_action_outcome_preserved" in provided and inputs.get("attribution_action_outcome_preserved") is False)
+        or ("attribution_learnable_component" in provided and inputs.get("attribution_learnable_component") is False)
+        or (
+            "attribution_conditionality_defined" in provided
+            and "attribution_locus" in provided
+            and inputs.get("attribution_locus") in ("EXTERNAL", "INTERACTIONAL")
+            and inputs.get("attribution_conditionality_defined") is False
+        )
     ):
         candidates.append({
             "id": "attribution",
-            "label": "External Attribution",
-            "description": "Outcome is attributed externally, reducing ownership and leverage.",
+            "label": "Attribution Failure",
+            "description": "Attribution removes individual learning pathways or action–outcome linkage.",
             "impact": "medium",
-            "action_hint": "What part of this is actually within your control?"
+            "action_hint": "Identify a learnable skill, strategy, or behavior you can change."
         })
 
     if (

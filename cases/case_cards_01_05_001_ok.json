@@ -18,7 +18,11 @@
     "delegates_to_others": false,
     "attribution_locus": "EXTERNAL",
     "attribution_stability": "TEMPORARY",
-    "attribution_scope": "SPECIFIC"
+    "attribution_scope": "SPECIFIC",
+    "attribution_universal_helplessness": false,
+    "attribution_conditionality_defined": true,
+    "attribution_action_outcome_preserved": true,
+    "attribution_learnable_component": true
   },
   "operator_sequence": [
     "op.card01_state_standard",
@@ -35,7 +39,7 @@
       "controllability_level": "HIGH",
       "resulting_valence": "APPROACH",
       "causal_weight_ok": true,
-      "attribution_recode_required": false
+      "attribution_valid": true
     }
   }
 }

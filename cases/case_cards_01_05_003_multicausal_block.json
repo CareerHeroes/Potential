@@ -18,7 +18,11 @@
     "delegates_to_others": true,
     "attribution_locus": "INTERNAL",
     "attribution_stability": "TEMPORARY",
-    "attribution_scope": "SPECIFIC"
+    "attribution_scope": "SPECIFIC",
+    "attribution_universal_helplessness": false,
+    "attribution_conditionality_defined": true,
+    "attribution_action_outcome_preserved": true,
+    "attribution_learnable_component": true
   },
   "operator_sequence": [
     "op.card01_state_standard",

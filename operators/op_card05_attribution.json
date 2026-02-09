@@ -3,24 +3,47 @@
   "name": "Card 05: Attribution Systems",
   "rules": [
     {
-      "when": "attribution_locus == 'INTERNAL' and attribution_stability == 'PERMANENT' and attribution_scope == 'GLOBAL'",
+      "when": "attribution_universal_helplessness == true",
       "set": {
-        "attribution_recode_required": true
+        "attribution_valid": false,
+        "attribution_issue": "UNIVERSAL_HELPLESSNESS"
+      }
+    },
+    {
+      "when": "(attribution_locus == 'EXTERNAL' or attribution_locus == 'INTERACTIONAL') and attribution_conditionality_defined == false",
+      "set": {
+        "attribution_valid": false,
+        "attribution_issue": "MISSING_CONDITIONS"
+      }
+    },
+    {
+      "when": "attribution_action_outcome_preserved == false",
+      "set": {
+        "attribution_valid": false,
+        "attribution_issue": "NO_ACTION_OUTCOME_LINK"
+      }
+    },
+    {
+      "when": "attribution_learnable_component == false",
+      "set": {
+        "attribution_valid": false,
+        "attribution_issue": "NO_LEARNABLE_COMPONENT"
       }
     },
     {
       "when": "true",
       "set": {
-        "attribution_recode_required": false
+        "attribution_valid": true,
+        "attribution_issue": "NONE"
       }
     }
   ],
   "gates": [
     {
-      "id": "gate.attribution_recode",
-      "when": "attribution_recode_required == true",
+      "id": "gate.attribution_invalid",
+      "when": "attribution_valid == false",
       "action": "BLOCK_PROGRESS",
-      "message": "Translate permanent/global/internal attribution into temporary/specific/actionable terms."
+      "message": "Attribution removes individual learning pathways. Identify a skill-, strategy-, or behavior-based leverage point."
     }
   ]
 }
