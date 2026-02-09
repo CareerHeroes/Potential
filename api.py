@@ -357,6 +357,17 @@ def _cap(value: float, low: float = 0.0, high: float = 100.0) -> float:
     return max(low, min(high, value))
 
 
+def _normalize_valence(raw: float) -> float:
+    if raw is None:
+        return 0.0
+    val = float(raw)
+    if -1.0 <= val <= 1.0:
+        return val
+    if -100.0 <= val <= 100.0:
+        return val / 100.0
+    return _cap(val, -1.0, 1.0)
+
+
 def compute_energy(inputs: dict, provided: set, gates_count: int, status: str) -> dict:
     potential = 0.0
 
@@ -414,7 +425,8 @@ def compute_energy(inputs: dict, provided: set, gates_count: int, status: str) -
 
     # Valence (max 25)
     if "resulting_valence" in provided:
-        utilization += _cap((float(inputs.get("resulting_valence", 0)) + 1) / 2 * 25, 0, 25)
+        normalized_valence = _normalize_valence(inputs.get("resulting_valence", 0))
+        utilization += _cap((normalized_valence + 1) / 2 * 25, 0, 25)
 
     # Learning stage (max 12)
     if "learning_stage" in provided:
