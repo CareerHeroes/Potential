@@ -335,6 +335,269 @@ def missing_inputs_for(sequence: list, inputs: dict) -> dict:
     return missing
 
 
+_PREV_SCORES = {}
+
+
+def _provided_set(payload: dict, inputs: dict) -> set:
+    provided = payload.get("inputs_provided")
+    if isinstance(provided, list):
+        return set(provided)
+    return set(inputs.keys())
+
+
+def _cap(value: float, low: float = 0.0, high: float = 100.0) -> float:
+    return max(low, min(high, value))
+
+
+def compute_energy(inputs: dict, provided: set, gates_count: int, status: str) -> dict:
+    potential = 0.0
+
+    # State clarity (max 25)
+    if "state_is_verifiable" in provided and inputs.get("state_is_verifiable") is True:
+        potential += 15
+    if "standard_value" in provided and inputs.get("standard_value") not in (None, ""):
+        potential += 10
+
+    # Controllability (max 35)
+    if "controllability_scalar" in provided:
+        potential += _cap(float(inputs.get("controllability_scalar", 0)) * 20, 0, 20)
+    if "user_causal_weight" in provided:
+        potential += _cap(float(inputs.get("user_causal_weight", 0)) * 10, 0, 10)
+    if "attribution_locus" in provided and inputs.get("attribution_locus") != "EXTERNAL":
+        potential += 5
+
+    # Attribution style (max 20)
+    if "attribution_locus" in provided and inputs.get("attribution_locus") == "INTERNAL":
+        potential += 8
+    if "attribution_stability" in provided and inputs.get("attribution_stability") == "STABLE":
+        potential += 6
+    if "attribution_scope" in provided and inputs.get("attribution_scope") == "GLOBAL":
+        potential += 6
+
+    # Identity capacity (max 10)
+    if "attempts_identity_change" in provided and inputs.get("attempts_identity_change") is True:
+        potential += 3
+    if "successful_transitions_count" in provided:
+        potential += _cap(float(inputs.get("successful_transitions_count", 0)) * 2, 0, 7)
+
+    # AoR verified (max 5)
+    if "aor_verified" in provided and inputs.get("aor_verified") is True:
+        potential += 5
+
+    # No blockers bonus (max 5)
+    if (
+        "fear_reported" in provided
+        and "behavior_stuck" in provided
+        and inputs.get("fear_reported") is False
+        and inputs.get("behavior_stuck") is False
+    ):
+        potential += 5
+
+    # Temporal rule bonus (max 8)
+    if "internal_kinetic_spent" in provided:
+        if inputs.get("internal_kinetic_spent") is True and inputs.get("capacity_increased") is True:
+            potential += 8
+        elif inputs.get("internal_kinetic_spent") is True:
+            potential += 3
+
+    # Velocity bonus (max 5)
+    if "goal_defined" in provided and inputs.get("goal_defined") is True:
+        potential += 5
+
+    potential = _cap(potential)
+
+    utilization = 0.0
+    # Effort (max 30)
+    if "effort_correct" in provided and inputs.get("effort_correct") is True:
+        utilization += 10
+    if "input_level" in provided:
+        utilization += _cap(float(inputs.get("input_level", 0)) / 100 * 10, 0, 10)
+    if "effort" in provided:
+        utilization += _cap(float(inputs.get("effort", 0)) / 100 * 10, 0, 10)
+
+    # Valence (max 25)
+    if "resulting_valence" in provided:
+        utilization += _cap((float(inputs.get("resulting_valence", 0)) + 1) / 2 * 25, 0, 25)
+
+    # Learning stage (max 12)
+    if "learning_stage" in provided:
+        utilization += _cap(float(inputs.get("learning_stage", 0)) / 5 * 12, 0, 12)
+
+    # Blocker absence (max 25)
+    if "behavior_stuck" in provided and inputs.get("behavior_stuck") is False:
+        utilization += 7
+    if "procrastination_reported" in provided and inputs.get("procrastination_reported") is False:
+        utilization += 6
+    if "fear_reported" in provided and inputs.get("fear_reported") is False:
+        utilization += 6
+    if "confusion_reported" in provided and inputs.get("confusion_reported") is False:
+        utilization += 6
+
+    # Transition (max 8)
+    if "transition_phase" in provided and inputs.get("transition_phase") is True:
+        utilization += 5
+    if "demands_certainty" in provided and inputs.get("demands_certainty") is False:
+        utilization += 3
+
+    # Penalties
+    if (
+        "energy_expended" in provided
+        and "displacement_observed" in provided
+        and inputs.get("energy_expended") is True
+        and inputs.get("displacement_observed") is False
+    ):
+        utilization -= 10
+    if (
+        "goal_defined" in provided
+        and "motion_coherent" in provided
+        and inputs.get("goal_defined") is True
+        and inputs.get("motion_coherent") is True
+    ):
+        utilization += 10
+    if (
+        "internal_motion" in provided
+        and "motion_coherent" in provided
+        and inputs.get("internal_motion") is True
+        and inputs.get("motion_coherent") is False
+    ):
+        utilization -= 5
+    if (
+        "impulsive_action_observed" in provided
+        and "constraints_lowered" in provided
+        and inputs.get("impulsive_action_observed") is True
+        and inputs.get("constraints_lowered") is True
+    ):
+        utilization -= 5
+    if "short_term_imbalance_for_long_term_stability" in provided and inputs.get("short_term_imbalance_for_long_term_stability") is True:
+        utilization += 5
+
+    # Gate penalties
+    if gates_count > 0:
+        utilization -= (gates_count * 15)
+
+    utilization = _cap(utilization)
+
+    # Constraint: utilization cannot exceed potential
+    utilization = min(utilization, potential)
+
+    gap = _cap(potential - utilization)
+    ready_to_act = bool(utilization >= 55 and status != "GATED" and gap < 35)
+
+    return {
+        "potential": int(round(potential)),
+        "utilization": int(round(utilization)),
+        "gap": int(round(gap)),
+        "ready_to_act": ready_to_act
+    }
+
+
+def apply_ema(case_id: str, energy: dict) -> dict:
+    if not case_id:
+        return energy
+    prev = _PREV_SCORES.get(case_id)
+    if not prev:
+        _PREV_SCORES[case_id] = energy
+        return energy
+    blended = {}
+    for key in ("potential", "utilization", "gap"):
+        blended[key] = int(round(0.4 * energy[key] + 0.6 * prev.get(key, energy[key])))
+    blended["ready_to_act"] = bool(blended["utilization"] >= 55 and blended["gap"] < 35)
+    _PREV_SCORES[case_id] = blended
+    return blended
+
+
+def identify_fulcrums(inputs: dict, provided: set) -> list:
+    candidates = []
+
+    if (
+        "energy_expended" in provided
+        and "displacement_observed" in provided
+        and inputs.get("energy_expended") is True
+        and inputs.get("displacement_observed") is False
+    ):
+        candidates.append({
+            "id": "work_rule",
+            "label": "No Displacement",
+            "description": "Energy is being spent without changing the external state.",
+            "impact": "high",
+            "action_hint": "What threshold is blocking displacement right now?"
+        })
+
+    if (
+        "goal_defined" in provided
+        and "motion_coherent" in provided
+        and (inputs.get("goal_defined") is False or inputs.get("motion_coherent") is False)
+    ):
+        candidates.append({
+            "id": "velocity",
+            "label": "Lack of Direction",
+            "description": "Activity exists without a coherent goal or direction.",
+            "impact": "high",
+            "action_hint": "What is the specific goal this motion should serve?"
+        })
+
+    for key, label, hint in [
+        ("fear_reported", "Fear Constraint", "What signal would reduce this fear?"),
+        ("behavior_stuck", "Stuck Loop", "What is one smallest move that breaks the loop?"),
+        ("procrastination_reported", "Procrastination", "What would make starting easier today?"),
+        ("impulsive_action_observed", "Impulsivity", "What constraint needs stabilizing first?")
+    ]:
+        if key in provided and inputs.get(key) is True:
+            candidates.append({
+                "id": key,
+                "label": label,
+                "description": "Behavioral blocker is reducing effective motion.",
+                "impact": "medium",
+                "action_hint": hint
+            })
+
+    if "controllability_scalar" in provided and float(inputs.get("controllability_scalar", 1)) < 0.4:
+        candidates.append({
+            "id": "controllability",
+            "label": "Sense of Agency",
+            "description": "You feel limited in how much you can influence the outcome.",
+            "impact": "medium",
+            "action_hint": "What is one thing you can change right now, even if small?"
+        })
+    if (
+        "attribution_locus" in provided
+        and inputs.get("attribution_locus") == "EXTERNAL"
+    ):
+        candidates.append({
+            "id": "attribution",
+            "label": "External Attribution",
+            "description": "Outcome is attributed externally, reducing ownership and leverage.",
+            "impact": "medium",
+            "action_hint": "What part of this is actually within your control?"
+        })
+
+    if (
+        ("state_is_verifiable" in provided and inputs.get("state_is_verifiable") is False)
+        or ("standard_value" in provided and inputs.get("standard_value") in (None, ""))
+    ):
+        candidates.append({
+            "id": "clarity_gap",
+            "label": "Clarity Gap",
+            "description": "The current state or standard is not yet clear.",
+            "impact": "low",
+            "action_hint": "State the current facts and the exact standard you are using."
+        })
+
+    priority = [
+        "work_rule",
+        "velocity",
+        "fear_reported",
+        "behavior_stuck",
+        "procrastination_reported",
+        "impulsive_action_observed",
+        "controllability",
+        "attribution",
+        "clarity_gap"
+    ]
+    candidates.sort(key=lambda item: priority.index(item["id"]) if item["id"] in priority else 99)
+    return candidates[:3]
+
+
 class Handler(BaseHTTPRequestHandler):
     def _set_headers(self, status_code: int = 200):
         self.send_response(status_code)
@@ -381,6 +644,7 @@ class Handler(BaseHTTPRequestHandler):
             self._set_headers(400)
             self.wfile.write(json.dumps({"error": "inputs must be object"}).encode("utf-8"))
             return
+        provided = _provided_set(payload, inputs)
 
         if self.path == "/route":
             top_n = payload.get("top_n", 3)
@@ -431,13 +695,18 @@ class Handler(BaseHTTPRequestHandler):
 
             missing = missing_inputs_for(sequence, inputs)
             if missing:
+                energy = compute_energy(inputs, provided, 0, "NEEDS_INPUTS")
+                energy = apply_ema(case_id, energy)
+                fulcrums = identify_fulcrums(inputs, provided)
                 self._set_headers(200)
                 self.wfile.write(json.dumps({
                     "status": "NEEDS_INPUTS",
                     "route": routed,
                     "phase_recommendation": phase,
                     "phase_confidence": confidence,
-                    "missing_inputs": missing
+                    "missing_inputs": missing,
+                    "computed_energy": energy,
+                    "fulcrums": fulcrums
                 }).encode("utf-8"))
                 return
 
@@ -450,12 +719,18 @@ class Handler(BaseHTTPRequestHandler):
                 self.wfile.write(json.dumps({"error": str(exc)}).encode("utf-8"))
                 return
 
+            gates_count = len(result.get("gates_triggered", []))
+            energy = compute_energy(inputs, provided, gates_count, result.get("status"))
+            energy = apply_ema(case_id, energy)
+            fulcrums = identify_fulcrums(inputs, provided)
             self._set_headers(200)
             self.wfile.write(json.dumps({
                 "route": routed,
                 "phase_recommendation": phase,
                 "phase_confidence": confidence,
-                "result": result
+                "result": result,
+                "computed_energy": energy,
+                "fulcrums": fulcrums
             }).encode("utf-8"))
             return
 
