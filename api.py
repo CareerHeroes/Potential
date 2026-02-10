@@ -155,7 +155,7 @@ PHASE_SIGNAL_KEYS = [
 ]
 
 
-def _weighted_completeness(provided: set) -> int:
+def _weighted_completeness(provided: set) -> dict:
     core = {
         "state_is_verifiable": 3,
         "standard_value": 3,
@@ -180,8 +180,15 @@ def _weighted_completeness(provided: set) -> int:
     filled_weight = sum(weight for key, weight in core.items() if key in provided)
     filled_weight += sum(weight for key, weight in supporting.items() if key in provided)
     if total_weight == 0:
-        return 0
-    return int(round((filled_weight / total_weight) * 100))
+        return {"score": 0, "filled_weight": 0, "total_weight": 0, "counted_keys": []}
+    counted_keys = [key for key in {**core, **supporting}.keys() if key in provided]
+    score = int(round((filled_weight / total_weight) * 100))
+    return {
+        "score": score,
+        "filled_weight": filled_weight,
+        "total_weight": total_weight,
+        "counted_keys": counted_keys
+    }
 
 
 def _count_contradictions(inputs: dict, provided: set) -> int:
@@ -226,11 +233,11 @@ def phase_confidence(inputs: dict, provided: set, phase: str, current_energy: di
     coherence = max(0, 100 - (contradictions * 25))
     stability = _stability_from_energy(previous_energy, current_energy)
 
-    score = int(round(0.5 * completeness + 0.3 * stability + 0.2 * coherence))
+    score = int(round(0.5 * completeness["score"] + 0.3 * stability + 0.2 * coherence))
     return {
         "score": score,
         "reasons": {
-            "completeness": completeness,
+            "completeness": completeness["score"],
             "coherence": coherence,
             "stability": stability,
             "contradictions": contradictions
@@ -243,6 +250,9 @@ def phase_confidence(inputs: dict, provided: set, phase: str, current_energy: di
             },
             "inputs_provided_count": len(provided),
             "inputs_provided_total": len(PHASE_SIGNAL_KEYS),
+            "weighted_filled": completeness["filled_weight"],
+            "weighted_total": completeness["total_weight"],
+            "weighted_counted_keys": completeness["counted_keys"],
             "energy_delta": {
                 "potential": (
                     None if not isinstance(previous_energy, dict) else current_energy.get("potential") - previous_energy.get("potential", 0)
