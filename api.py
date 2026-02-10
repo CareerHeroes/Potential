@@ -503,8 +503,11 @@ _PREV_SCORES = {}
 
 def _provided_set(payload: dict, inputs: dict) -> set:
     provided = payload.get("inputs_provided")
-    if isinstance(provided, list):
-        return set(provided)
+    previous = payload.get("previous_inputs_provided")
+    provided_set = set(provided) if isinstance(provided, list) else set()
+    previous_set = set(previous) if isinstance(previous, list) else set()
+    if provided_set or previous_set:
+        return provided_set.union(previous_set)
     return set(inputs.keys())
 
 
