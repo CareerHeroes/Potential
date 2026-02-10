@@ -141,17 +141,31 @@ def recommend_phase(inputs: dict) -> str:
 
 
 PHASE_SIGNAL_KEYS = [
-    "state_gap_defined",
-    "aor_verified",
-    "controllability_scalar",
+    "state_is_verifiable",
+    "standard_value",
     "resulting_valence",
+    "controllability_scalar",
+    "p_success",
+    "has_articulated_next_steps",
+    "has_addressed_uncertainties",
+    "reasoning_is_explicit",
+    "assumptions_are_stated",
+    "behavior_stuck",
+    "goal_defined",
+    "transition_phase",
+    "fear_reported",
+    "procrastination_reported",
+    "confusion_reported",
+    "energy_expended",
+    "displacement_observed",
+    "motion_coherent",
+    "attempts_identity_change",
+    "successful_transitions_count",
+    "constraint_type",
+    "aor_verified",
     "action_defined",
     "success_signal_defined",
-    "adaptation_defined",
-    "acted_recently",
-    "potential_building_effort_low",
-    "quality_impact_high",
-    "user_reasoning_sound"
+    "adaptation_defined"
 ]
 
 
@@ -161,7 +175,12 @@ def _weighted_completeness(provided: set) -> dict:
         "standard_value": 3,
         "resulting_valence": 3,
         "controllability_scalar": 3,
-        "p_success": 3
+        "p_success": 3,
+        "goal_defined": 3,
+        "has_articulated_next_steps": 3,
+        "has_addressed_uncertainties": 3,
+        "reasoning_is_explicit": 3,
+        "assumptions_are_stated": 3
     }
     supporting = {
         "attribution_universal_helplessness": 1,
@@ -174,7 +193,15 @@ def _weighted_completeness(provided: set) -> dict:
         "aor_verified": 1,
         "action_defined": 1,
         "success_signal_defined": 1,
-        "adaptation_defined": 1
+        "adaptation_defined": 1,
+        "behavior_stuck": 1,
+        "transition_phase": 1,
+        "fear_reported": 1,
+        "procrastination_reported": 1,
+        "confusion_reported": 1,
+        "energy_expended": 1,
+        "displacement_observed": 1,
+        "motion_coherent": 1
     }
     total_weight = sum(core.values()) + sum(supporting.values())
     filled_weight = sum(weight for key, weight in core.items() if key in provided)
