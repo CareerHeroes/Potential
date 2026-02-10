@@ -234,6 +234,26 @@ def phase_confidence(inputs: dict, provided: set, phase: str, current_energy: di
             "coherence": coherence,
             "stability": stability,
             "contradictions": contradictions
+        },
+        "debug": {
+            "weights": {
+                "completeness": 0.5,
+                "stability": 0.3,
+                "coherence": 0.2
+            },
+            "inputs_provided_count": len(provided),
+            "inputs_provided_total": len(PHASE_SIGNAL_KEYS),
+            "energy_delta": {
+                "potential": (
+                    None if not isinstance(previous_energy, dict) else current_energy.get("potential") - previous_energy.get("potential", 0)
+                ),
+                "utilization": (
+                    None if not isinstance(previous_energy, dict) else current_energy.get("utilization") - previous_energy.get("utilization", 0)
+                ),
+                "gap": (
+                    None if not isinstance(previous_energy, dict) else current_energy.get("gap") - previous_energy.get("gap", 0)
+                )
+            }
         }
     }
 
